@@ -460,54 +460,82 @@ def create_bollinger_chart(df):
     
     fig = go.Figure()
     
+    # Price line - make it prominent
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['Close'],
             name='Price',
-            line=dict(color='#1E3A8A', width=2),
+            line=dict(color='#1E3A8A', width=3),
             mode='lines'
         )
     )
     
+    # Bollinger Bands - make them more visible
+    # Upper band - thicker, dashed, different color
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['BB_Upper'],
             name='BB Upper',
-            line=dict(color='gray', dash='dash', width=1),
-            opacity=0.5
+            line=dict(color='#DC2626', width=2, dash='dash'),  # Red, dashed
+            opacity=0.8,
+            fillcolor='rgba(220, 38, 38, 0.1)',
+            fill='tonexty'
         )
     )
     
+    # Middle band - keep subtle
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['BB_Middle'],
-            name='BB Middle',
-            line=dict(color='gray', width=1),
-            opacity=0.5
+            name='BB Middle (SMA 20)',
+            line=dict(color='#6B7280', width=1.5),  # Gray
+            opacity=0.6
         )
     )
     
+    # Lower band - thicker, dashed, different color
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['BB_Lower'],
             name='BB Lower',
-            line=dict(color='gray', dash='dash', width=1),
+            line=dict(color='#059669', width=2, dash='dash'),  # Green, dashed
+            opacity=0.8,
             fill='tonexty',
-            opacity=0.3
+            fillcolor='rgba(5, 150, 105, 0.1)'
         )
     )
     
     fig.update_layout(
-        title='Bollinger Bands',
+        title='Bollinger Bands (More Visible)',
         height=400,
         showlegend=True,
         xaxis_title="Date",
         yaxis_title="Price",
-        template='plotly_white'
+        template='plotly_white',
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+    
+    # Add annotation explaining the bands
+    fig.add_annotation(
+        xref="paper", yref="paper",
+        x=0.02, y=0.98,
+        text="Upper/Lower Bands = SMA 20 ± 2σ",
+        showarrow=False,
+        font=dict(size=10, color="gray"),
+        bgcolor="white",
+        bordercolor="gray",
+        borderwidth=1,
+        borderpad=4
     )
     
     return fig
