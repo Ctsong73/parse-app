@@ -21,7 +21,6 @@ st.set_page_config(
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import ROC Detector functions (inlined)
-ROC_AVAILABLE = True
 def roc_trend_detector(series, window=3, threshold=0.02, consecutive=3):
     """Detects trends based on Rate of Change (ROC)"""
     roc = series.pct_change(periods=window)
@@ -51,10 +50,69 @@ def plot_roc_trends(df, threshold=0.01):
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.bar(roc_clean.index, roc_clean * 100, color=colors)
     ax.axhline(y=threshold * 100, color='blue', linestyle='--', label='Uptrend Threshold')
-    
-    plt.tight_layout()
-    return fig
+# Custom CSS for better styling
+st.markdown("""
+<style>
+.main-header {
+    font-size: 2.8rem;
+    color: #1E3A8A;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.sub-header {
+    font-size: 1.5rem;
+    color: #4B5563;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: normal;
+}
+/* Hide GitHub icon */
+[data-testid="stMainMenu"],
+[href*="github"] {
+    display: none !important;
+}
+.stButton>button {
+    background-color: #1E3A8A;
+    color: white;
+    font-weight: bold;
+}
+.metric-card {
+    background-color: #F3F4F6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #1E3A8A;
+}
+.trend-up { color: #10B981; font-weight: bold; }
+.trend-down { color: #EF4444; font-weight: bold; }
+.trend-neutral { color: #6B7280; font-weight: bold; }
+.ai-analysis {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #4f46e5;
+    margin: 20px 0;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+.instructions-box {
+    background-color: #f0f9ff;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #0369a1;
+    margin: 20px 0;
+}
+</style>
+""", unsafe_allow_html=True)
 
+# Title with different font sizes
+st.markdown("<h1 class='main-header'>Parse</h1>", unsafe_allow_html=True)
+st.markdown("<h2 class='sub-header'>Technical Analysis AI Assistant</h2>", unsafe_allow_html=True)
+st.markdown("Upload your price data for comprehensive technical analysis with AI insights.")
+
+# ----------------------------------------------------
+# GROQ API SETUP - FREE & EASY
+# ----------------------------------------------------
 def setup_groq():
     """Setup Groq API - FREE & No Credit Card Needed"""
     if 'groq_api_key' not in st.session_state:
