@@ -22,6 +22,36 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import ROC Detector functions (inlined)
 ROC_AVAILABLE = True
+
+# Custom CSS for better styling
+st.markdown("""
+<style>
+.main-header {
+    font-size: 3.5rem;
+    color: #1E3A8A;
+    text-align: center;
+    margin-bottom: 0.2rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+.sub-header {
+    font-size: 1.3rem;
+    color: #4B5563;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+    font-style: italic;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Title with different font sizes
+st.markdown("<h1 class='main-header'>Parse</h1>", unsafe_allow_html=True)
+st.markdown("<h3 class='sub-header'>Technical Analysis AI Assistant</h3>", unsafe_allow_html=True)
+st.markdown("Upload your price data for comprehensive technical analysis with AI insights.")
+
 def roc_trend_detector(series, window=3, threshold=0.02, consecutive=3):
     """Detects trends based on Rate of Change (ROC)"""
     roc = series.pct_change(periods=window)
