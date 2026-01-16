@@ -510,7 +510,7 @@ def create_bollinger_chart(df):
     )
     
     fig.update_layout(
-        title='Bollinger Bands (More Visible)',
+        title='Bollinger Bands',
         height=400,
         showlegend=True,
         xaxis_title="Date",
@@ -523,19 +523,6 @@ def create_bollinger_chart(df):
             xanchor="right",
             x=1
         )
-    )
-    
-    # Add annotation explaining the bands
-    fig.add_annotation(
-        xref="paper", yref="paper",
-        x=0.02, y=0.98,
-        text="Upper/Lower Bands = SMA 20 ± 2σ",
-        showarrow=False,
-        font=dict(size=10, color="gray"),
-        bgcolor="white",
-        bordercolor="gray",
-        borderwidth=1,
-        borderpad=4
     )
     
     return fig
