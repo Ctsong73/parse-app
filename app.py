@@ -80,7 +80,18 @@ def plot_roc_trends(df, threshold=0.01):
 
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.bar(roc_clean.index, roc_clean * 100, color=colors)
-    ax.axhline(y=threshold * 100, color='blue', linestyle='--', label='Uptrend Threshold')
+    
+    # Add both threshold lines
+    ax.axhline(y=threshold * 100, color='green', linestyle='--', linewidth=1.5, alpha=0.7, label='Uptrend Threshold')
+    ax.axhline(y=-threshold * 100, color='red', linestyle='--', linewidth=1.5, alpha=0.7, label='Downtrend Threshold')
+    ax.axhline(y=0, color='gray', linestyle='-', linewidth=0.5, alpha=0.5)
+    
+    # Add labels and legend
+    ax.set_xlabel('Date')
+    ax.set_ylabel('ROC (%)')
+    ax.set_title('Rate of Change (ROC) Trend Analysis')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
     return fig
