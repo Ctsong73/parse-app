@@ -50,93 +50,58 @@ def plot_roc_trends(df, threshold=0.01):
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.bar(roc_clean.index, roc_clean * 100, color=colors)
     ax.axhline(y=threshold * 100, color='blue', linestyle='--', label='Uptrend Threshold')
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-    }
-    
-    /* Also hide any GitHub links in text */
-    a[href*="github.com"],
-    a[href*="github.io"] {
-        display: none !important;
-    }
-    plt.tight_layout()
-    return fig
-
-# Initialize ROC availability
-ROC_AVAILABLE = True
-
 # Custom CSS for better styling
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.8rem;
-        color: #1E3A8A;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #4B5563;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-weight: normal;
-    }
-    /* Hide GitHub icon - Comprehensive selectors */
-    [data-testid="stMainMenu"],
-    [data-testid="baseButton-header"],
-    button[data-testid="baseButton-headerNoPadding"],
-    .st-emotion-cache-1v0mbdj,
-    .st-emotion-cache-1inwz65,
-    [href*="github"],
-    a[href*="github"],
-    svg[data-testid*="github"],
-    button[aria-label*="GitHub"],
-    button[title*="GitHub"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        position: absolute !important;
-        left: -9999px !important;
-    }
-    
-    /* Hide GitHub links */
-    a[href*="github.com"],
-    a[href*="github.io"] {
-        display: none !important;
-    }
-    .stButton>button {
-        background-color: #1E3A8A;
-        color: white;
-        font-weight: bold;
-    }
-    .metric-card {
-        background-color: #F3F4F6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #1E3A8A;
-    }
-    .trend-up { color: #10B981; font-weight: bold; }
-    .trend-down { color: #EF4444; font-weight: bold; }
-    .trend-neutral { color: #6B7280; font-weight: bold; }
-    .ai-analysis {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 5px solid #4f46e5;
-        margin: 20px 0;
-        font-family: 'Georgia', serif;
-        line-height: 1.6;
-        white-space: pre-wrap;
-    }
-    .instructions-box {
-        background-color: #f0f9ff;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 5px solid #0369a1;
-        margin: 20px 0;
-    }
+.main-header {
+    font-size: 2.8rem;
+    color: #1E3A8A;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.sub-header {
+    font-size: 1.5rem;
+    color: #4B5563;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: normal;
+}
+/* Hide GitHub icon */
+[data-testid="stMainMenu"],
+[href*="github"] {
+    display: none !important;
+}
+.stButton>button {
+    background-color: #1E3A8A;
+    color: white;
+    font-weight: bold;
+}
+.metric-card {
+    background-color: #F3F4F6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #1E3A8A;
+}
+.trend-up { color: #10B981; font-weight: bold; }
+.trend-down { color: #EF4444; font-weight: bold; }
+.trend-neutral { color: #6B7280; font-weight: bold; }
+.ai-analysis {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #4f46e5;
+    margin: 20px 0;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+.instructions-box {
+    background-color: #f0f9ff;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #0369a1;
+    margin: 20px 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
