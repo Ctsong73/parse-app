@@ -50,12 +50,16 @@ def plot_roc_trends(df, threshold=0.01):
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.bar(roc_clean.index, roc_clean * 100, color=colors)
     ax.axhline(y=threshold * 100, color='blue', linestyle='--', label='Uptrend Threshold')
-    ax.axhline(y=-threshold * 100, color='red', linestyle='--', label='Downtrend Threshold')
-    ax.set_title('Rate of Change (ROC) with Trend Detection')
-    ax.set_xlabel('Date')
-    ax.set_ylabel('ROC (%)')
-    ax.legend()
-    ax.grid(True, linestyle='--', alpha=0.5)
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    
+    /* Also hide any GitHub links in text */
+    a[href*="github.com"],
+    a[href*="github.io"] {
+        display: none !important;
+    }
     plt.tight_layout()
     return fig
 
@@ -78,11 +82,28 @@ st.markdown("""
         margin-bottom: 2rem;
         font-weight: normal;
     }
-    /* Hide GitHub icon */
-    .st-emotion-cache-1v0mbdj.e115fcil1 {
+    /* Hide GitHub icon - Comprehensive selectors */
+    [data-testid="stMainMenu"],
+    [data-testid="baseButton-header"],
+    button[data-testid="baseButton-headerNoPadding"],
+    .st-emotion-cache-1v0mbdj,
+    .st-emotion-cache-1inwz65,
+    [href*="github"],
+    a[href*="github"],
+    svg[data-testid*="github"],
+    button[aria-label*="GitHub"],
+    button[title*="GitHub"] {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
     }
-    a[href*="github"] {
+    
+    /* Hide GitHub links */
+    a[href*="github.com"],
+    a[href*="github.io"] {
         display: none !important;
     }
     .stButton>button {
