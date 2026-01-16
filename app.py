@@ -78,6 +78,13 @@ st.markdown("""
         margin-bottom: 2rem;
         font-weight: normal;
     }
+    /* Hide GitHub icon */
+    .st-emotion-cache-1v0mbdj.e115fcil1 {
+        display: none !important;
+    }
+    a[href*="github"] {
+        display: none !important;
+    }
     .stButton>button {
         background-color: #1E3A8A;
         color: white;
@@ -1076,7 +1083,7 @@ st.markdown(
     """
     <div style='text-align: center; color: gray;'>
     <p style='font-size: 16px; font-weight: bold;'>Parse: Technical Analysis AI Assistant</p>
-    <p style='font-size: 12px;'>Powered by Groq AI • Built with Streamlit • Rate of Change (ROC) Trend Detection</p>
+    <p style='font-size: 12px;'>Powered by Groq AI • Rate of Change (ROC) Trend Detection</p>
     </div>
     """,
     unsafe_allow_html=True
