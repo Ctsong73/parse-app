@@ -403,12 +403,19 @@ def create_main_chart(df, support_levels, resistance_levels):
             annotation_text=f"R: {level:.2f}"
         )
     
+    # Calculate 10% padding for y-axis
+    y_min = df['Close'].min()
+    y_max = df['Close'].max()
+    y_range = y_max - y_min
+    padding = y_range * 0.1
+    
     fig.update_layout(
         title=f'Price Chart ({data_frequency})',
         height=400,
         showlegend=True,
         xaxis_title="Date",
         yaxis_title="Price",
+        yaxis_range=[y_min - padding, y_max + padding],  # 10% padding
         template='plotly_white'
     )
     
@@ -442,12 +449,19 @@ def create_ma_chart(df, selected_ma_periods):
                 )
             )
     
+    # Calculate 10% padding for y-axis
+    y_min = df['Close'].min()
+    y_max = df['Close'].max()
+    y_range = y_max - y_min
+    padding = y_range * 0.1
+    
     fig.update_layout(
         title='Moving Averages',
         height=400,
         showlegend=True,
         xaxis_title="Date",
         yaxis_title="Price",
+        yaxis_range=[y_min - padding, y_max + padding],  # 10% padding
         template='plotly_white'
     )
     
@@ -509,12 +523,19 @@ def create_bollinger_chart(df):
         )
     )
     
+    # Calculate 10% padding for y-axis using Bollinger Band extremes
+    y_min = min(df['BB_Lower'].min(), df['Close'].min())
+    y_max = max(df['BB_Upper'].max(), df['Close'].max())
+    y_range = y_max - y_min
+    padding = y_range * 0.1
+    
     fig.update_layout(
         title='Bollinger Bands',
         height=400,
         showlegend=True,
         xaxis_title="Date",
         yaxis_title="Price",
+        yaxis_range=[y_min - padding, y_max + padding],  # 10% padding
         template='plotly_white',
         legend=dict(
             orientation="h",
@@ -543,9 +564,12 @@ def create_rsi_chart(df):
         )
     )
     
-    fig.add_hline(y=70, line_dash="dash", line_color="red", opacity=0.5)
-    fig.add_hline(y=30, line_dash="dash", line_color="green", opacity=0.5)
+    # Add RSI reference lines
+    fig.add_hline(y=70, line_dash="dash", line_color="red", opacity=0.5, annotation_text="Overbought (70)")
+    fig.add_hline(y=30, line_dash="dash", line_color="green", opacity=0.5, annotation_text="Oversold (30)")
     fig.add_hline(y=50, line_dash="dot", line_color="gray", opacity=0.3)
+    fig.add_hline(y=100, line_dash="dot", line_color="gray", opacity=0.3)  # Added 100 line
+    fig.add_hline(y=0, line_dash="dot", line_color="gray", opacity=0.3)    # Added 0 line
     
     fig.update_layout(
         title='Relative Strength Index (RSI)',
@@ -553,7 +577,7 @@ def create_rsi_chart(df):
         showlegend=True,
         xaxis_title="Date",
         yaxis_title="RSI",
-        yaxis_range=[0, 100],
+        yaxis_range=[-5, 105],  # Add padding for RSI (0-100 range)
         template='plotly_white'
     )
     
