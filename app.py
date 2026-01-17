@@ -96,6 +96,114 @@ def plot_roc_trends(df, threshold=0.01):
     plt.tight_layout()
     return fig
 
+
+
+def get_roc_summary_stats(roc_results):
+    """Get summary statistics from ROC results"""
+    if roc_results is None or roc_results.empty:
+        return {
+            "current_trend": "No Data",
+            "current_roc": 0,
+            "current_signal": "NEUTRAL",
+            "uptrend_count": 0,
+            "downtrend_count": 0,
+            "avg_roc_uptrend": 0,
+            "avg_roc_downtrend": 0
+        }
+    
+    current_trend = roc_results["Trend"].iloc[-1] if not roc_results["Trend"].iloc[-1] == "-" else "No Trend"
+    current_roc = roc_results["ROC"].iloc[-1] * 100 if not pd.isna(roc_results["ROC"].iloc[-1]) else 0
+    
+    if current_trend == "Uptrend":
+        current_signal = "BUY"
+    elif current_trend == "Downtrend":
+        current_signal = "SELL"
+    else:
+        current_signal = "NEUTRAL"
+    
+    uptrend_count = (roc_results["Trend"] == "Uptrend").sum()
+    downtrend_count = (roc_results["Trend"] == "Downtrend").sum()
+    
+    avg_roc_uptrend = roc_results.loc[roc_results["Trend"] == "Uptrend", "ROC"].mean() * 100 if uptrend_count > 0 else 0
+    avg_roc_downtrend = roc_results.loc[roc_results["Trend"] == "Downtrend", "ROC"].mean() * 100 if downtrend_count > 0 else 0
+    
+    return {
+        "current_trend": current_trend,
+        "current_roc": current_roc,
+        "current_signal": current_signal,
+        "uptrend_count": uptrend_count,
+        "downtrend_count": downtrend_count,
+        "avg_roc_uptrend": avg_roc_uptrend,
+        "avg_roc_downtrend": avg_roc_downtrend
+    }
+
+
+def display_roc_analysis(df, roc_window, roc_threshold, roc_consecutive):
+    """Display ROC Trend Detection analysis"""
+    if not ROC_AVAILABLE:
+        st.warning("ROC analysis is not available")
+        return None
+    
+    try:
+        roc_results = roc_trend_detector(
+            series=df["Close"],
+            window=roc_window,
+            threshold=roc_threshold,
+            consecutive=roc_consecutive
+        )
+        
+        summary = get_roc_summary_stats(roc_results)
+        
+        # Display metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            trend_class = "trend-up" if summary["current_trend"] == "Uptrend" else "trend-down" if summary["current_trend"] == "Downtrend" else "trend-neutral"
+            st.markdown(f"""
+            <div class="metric-card">
+                <h3>Current Trend</h3>
+                <p class="{trend_class}" style="font-size: 24px;">{summary["current_trend"]}</p>
+                <p>ROC: {summary["current_roc"]:.2f}%</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            signal_color = "trend-up" if summary["current_signal"] == "BUY" else "trend-down" if summary["current_signal"] == "SELL" else "trend-neutral"
+            st.markdown(f"""
+            <div class="metric-card">
+                <h3>Current Signal</h3>
+                <p class="{signal_color}" style="font-size: 24px;">{summary["current_signal"]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown(f"""
+            <div class="metric-card">
+                <h3>Uptrend Periods</h3>
+                <p style="font-size: 24px; color: #10B981;">{summary["uptrend_count"]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            st.markdown(f"""
+            <div class="metric-card">
+                <h3>Downtrend Periods</h3>
+                <p style="font-size: 24px; color: #EF4444;">{summary["downtrend_count"]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Plot ROC chart
+        st.subheader("ROC Analysis Chart")
+        roc_fig = plot_roc_trends(roc_results, threshold=roc_threshold)
+        st.pyplot(roc_fig)
+        
+        return roc_results
+        
+    except Exception as e:
+        st.error(f"Error in ROC analysis: {str(e)}")
+        import traceback
+        st.error(f"Details: {traceback.format_exc()}")
+        return None
 def setup_groq():
     """Setup Groq API - FREE & No Credit Card Needed"""
     if 'groq_api_key' not in st.session_state:
