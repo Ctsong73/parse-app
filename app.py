@@ -663,7 +663,7 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
     latest_data = df.iloc[-1] if len(df) > 0 else {}
     
     analysis_prompt = f"""
-    Generate a comprehensive 500-word technical analysis report:
+    Generate a comprehensive 1000-word detailed technical analysis report:
     
     SECURITY ANALYSIS REPORT
     ========================
@@ -712,7 +712,7 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
                 {"role": "user", "content": analysis_prompt}
             ],
             "temperature": ai_temperature if 'ai_temperature' in locals() else 0.7,
-            "max_tokens": 800
+            "max_tokens": 1500
         }
         
         with st.spinner("🤖 AI is analyzing the data..."):
