@@ -656,124 +656,102 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
         except:
             api_key = ""
     
-    if not api_key:
-        return "⚠️ Please configure Groq API key first. Get FREE key at: console.groq.com"
+    # DEBUG: Log API key status
+    if api_key:
+        print(f"[DEBUG] Groq API key found: {api_key[:10]}...")
+    else:
+        print("[DEBUG] No Groq API key found - using fallback analysis")
+        return generate_fallback_analysis(summary, support_levels, resistance_levels)
     
-    # Prepare the prompt
+    # Prepare the prompt with ACTUAL DATA
     latest_data = df.iloc[-1] if len(df) > 0 else {}
     
-    analysis_prompt = f"""
-    Generate a comprehensive technical analysis report that is approximately 1000 words in length. The report must be thorough and detailed, covering all aspects comprehensively.
-
-STRUCTURE YOUR 1000-WORD REPORT AS FOLLOWS:
-
-1. EXECUTIVE SUMMARY
-   - Brief overview of key findings
-   - Primary trading bias (bullish/bearish/neutral)
-   - Key price levels to watch
-
-2. MARKET CONTEXT AND ENVIRONMENT
-   - Current market conditions and sentiment
-   - Volatility assessment (high/low/medium)
-   - Volume analysis and liquidity considerations
-   - Overall market structure
-
-3. DETAILED PRICE ACTION ANALYSIS
-   - Current price position relative to historical ranges
-   - Recent price momentum and acceleration
-   - Candlestick patterns and formations
-   - Breakout/breakdown analysis
-   - Multiple timeframe alignment (if data permits)
-
-4. COMPREHENSIVE TREND ANALYSIS
-   - Primary trend direction and strength
-   - Secondary and tertiary trends
-   - Trend duration and maturity assessment
-   - Trend confirmation signals
-   - Potential trend reversal indicators
-
-5. TECHNICAL INDICATOR DEEP DIVE - FOCUSED EXPANDED ANALYSIS
-   MOVING AVERAGES (MA) DETAILED ANALYSIS:
-   - Current MA configuration: Exact values for MA_10, MA_20, MA_50, MA_100, MA_200 periods
-   - MA alignment and order: Bullish (shorter > longer) or Bearish (shorter < longer) alignment
-   - MA crossovers: Recent golden crosses (bullish) or death crosses (bearish) with dates and prices
-   - MA slopes: Upward, downward, or flat slopes indicating trend strength and direction
-   - MA as dynamic support/resistance: How price interacts with each moving average level
-   - MA confluence zones: Where multiple MAs cluster indicating strong support/resistance
-   - MA distance analysis: Percentage distance of price from each moving average
-   
-   RSI (RELATIVE STRENGTH INDEX) COMPREHENSIVE REVIEW:
-   - Current RSI value: Exact reading and its significance (oversold <30, neutral 30-70, overbought >70)
-   - RSI trend: Direction of RSI movement (rising, falling, flat) and momentum
-   - RSI divergence analysis: Regular and hidden divergences with price action
-   - RSI failure swings: Overbought/oversold failure swings indicating potential reversals
-   - RSI centerline crossovers: Bullish (crossing above 50) or bearish (crossing below 50)
-   - RSI range analysis: Current position within historical RSI ranges for this security
-   - RSI multi-timeframe consistency: How RSI readings align across different time horizons
-   - RSI pattern recognition: Formation of chart patterns within RSI itself
-   
-   MACD (MOVING AVERAGE CONVERGENCE DIVERGENCE) IN-DEPTH ANALYSIS:
-   - Current MACD line value: Exact reading and trend direction
-   - MACD signal line: Current value and relationship to MACD line (above/below)
-   - MACD histogram: Current histogram value, color (green/red), and momentum direction
-   - MACD zero line position: Above (bullish) or below (bearish) the zero line
-   - Recent MACD crossovers: Dates and significance of signal line crosses
-   - MACD divergence analysis: Bullish and bearish divergences with price confirmation
-   - MACD histogram patterns: Increasing/decreasing histogram bars indicating momentum shifts
-   - MACD trend strength: Steepness of MACD line indicating acceleration/deceleration
-   
-   BOLLINGER BANDS ADVANCED INTERPRETATION:
-   - Current band positions: Exact values for upper, middle (20MA), and lower bands
-   - Band width analysis: Narrow (low volatility, potential breakout) or wide (high volatility)
-   - Bollinger Band squeeze: Identification and significance of squeeze conditions
-   - Price position relative to bands: Upper band (overbought), middle (neutral), lower (oversold)
-   - %B indicator: Current %B value (0-100%) indicating position within bands
-   - Band breakout analysis: Recent breakouts above upper or below lower bands with volume
-   - Band walking: Price moving along upper/lower bands indicating strong trend
-   - Band support/resistance: How bands act as dynamic support and resistance levels
-   - Volatility assessment: Based on band expansion/contraction cycles
-   
-   INDICATOR CONFLUENCE AND SYNTHESIS:
-   - Agreement/disagreement: How all four indicators align or conflict in signals
-   - Signal strength assessment: Weight of evidence from combined indicator readings
-   - Timeframe alignment: Consistency of signals across the analyzed timeframe
-   - Historical context: How current indicator setup compares to past significant market events
-   - Risk assessment: What indicators suggest about current market risk environment
-
-6. SUPPORT AND RESISTANCE ZONE ANALYSIS
-   - Major support levels with confidence ratings
-   - Major resistance levels with confidence ratings
-   - Supply and demand zone identification
-   - Psychological price levels
-   - Historical significance of key levels
-
-7. RISK MANAGEMENT FRAMEWORK
-   - Stop-loss placement strategies
-   - Take-profit targets
-   - Risk-reward ratio assessment
-   - Portfolio allocation suggestions
-
-9. CONCLUSION AND KEY TAKEAWAYS
-   - Summary of most important findings
-   - Final trading recommendation
-   - Next key levels to monitor
-
-10. ACTIONABLE INSIGHTS CHECKLIST (Bullet points)
-    - Specific entry triggers
-    - Exit criteria
-    - Risk management rules
-    - Position management guidelines
-
-Ensure the total word count is approximately 1000 words by expanding on each section with detailed analysis, specific price references, and practical trading insights. Use precise numerical data from the provided analysis when available.
-
-Please provide a detailed technical analysis covering these specific sections:
-    1. Trend analysis and momentum
-    2. Key support/resistance levels
-    3. Technical indicator signals
-    4. Trading recommendations with specific price levels
-    5. Risk management advice
+    # Format support/resistance levels
+    support_text = ', '.join([f'\${level:.2f}' for level in support_levels[:3]]) if support_levels else 'None'
+    resistance_text = ', '.join([f'\${level:.2f}' for level in resistance_levels[:3]]) if resistance_levels else 'None'
     
-    Be professional, concise, and actionable. Focus on practical trading insights.
+    # Format MA values
+    ma_values = []
+    for period in selected_ma_periods:
+        ma_col = f'MA_{period}'
+        if ma_col in df.columns and not pd.isna(df[ma_col].iloc[-1]):
+            ma_values.append(f'MA {period}: \${df[ma_col].iloc[-1]:.2f}')
+    
+    analysis_prompt = f"""
+    IMPORTANT: USE ONLY THE ACTUAL DATA PROVIDED BELOW. DO NOT MAKE UP NUMBERS.
+    CURRENT PRICE IS \${summary.get('current_price', 0):.2f} - USE THIS EXACT PRICE.
+
+    SECURITY ANALYSIS REPORT
+    ========================
+
+    ACTUAL DATA FROM TECHNICAL ANALYSIS:
+    - Current Price: \${summary.get('current_price', 0):.2f}
+    - Price Change: {summary.get('price_change', 0):+.2f}%
+    - Market Trend: {summary.get('trend', 'Unknown')}
+    - RSI Level: {summary.get('rsi', 0):.2f} ({'Overbought' if summary.get('rsi', 0) > 70 else 'Oversold' if summary.get('rsi', 0) < 30 else 'Neutral'})
+    - Data Frequency: {data_frequency}
+    - Total Data Points: {len(df)}
+    - Time Period: {df.index[0].strftime('%Y-%m-%d') if len(df) > 0 else 'N/A'} to {df.index[-1].strftime('%Y-%m-%d') if len(df) > 0 else 'N/A'}
+
+    KEY PRICE LEVELS (USE THESE EXACT VALUES):
+    - Support Levels: {support_text}
+    - Resistance Levels: {resistance_text}
+
+    MOVING AVERAGES (ACTUAL VALUES):
+    - {', '.join(ma_values) if ma_values else 'No MA data'}
+
+    TECHNICAL INDICATORS (ACTUAL VALUES):
+    - MACD: {latest_data.get('MACD', 0):.6f}
+    - MACD Signal: {latest_data.get('MACD_Signal', 0):.6f}
+    - MACD Histogram: {latest_data.get('MACD_Hist', 0):.6f}
+    - Bollinger Upper: {latest_data.get('BB_Upper', 0):.2f}
+    - Bollinger Middle: {latest_data.get('BB_Middle', 0):.2f}
+    - Bollinger Lower: {latest_data.get('BB_Lower', 0):.2f}
+
+    Generate a comprehensive technical analysis report that is approximately 1000 words in length. 
+    The report must be thorough and detailed, covering all aspects comprehensively.
+
+    STRUCTURE YOUR 1000-WORD REPORT AS FOLLOWS:
+
+    1. EXECUTIVE SUMMARY
+       - Base summary on actual price: \${summary.get('current_price', 0):.2f}
+       - Use actual trend: {summary.get('trend', 'Unknown')}
+       - Reference actual support/resistance levels
+
+    2. MARKET CONTEXT AND ENVIRONMENT
+       - Reference actual data frequency: {data_frequency}
+       - Use actual time period covered
+
+    3. DETAILED PRICE ACTION ANALYSIS
+       - Focus on actual price: \${summary.get('current_price', 0):.2f}
+       - Compare to actual support: {support_text}
+       - Compare to actual resistance: {resistance_text}
+
+    4. COMPREHENSIVE TREND ANALYSIS
+       - Use actual trend: {summary.get('trend', 'Unknown')}
+       - Reference actual moving averages
+
+    5. TECHNICAL INDICATOR DEEP DIVE
+       - Use actual RSI: {summary.get('rsi', 0):.2f}
+       - Use actual MACD values provided above
+       - Use actual Bollinger Band values provided above
+       - Use actual Moving Average values provided above
+
+    6. SUPPORT AND RESISTANCE ZONE ANALYSIS
+       - Use ONLY the actual support levels: {support_text}
+       - Use ONLY the actual resistance levels: {resistance_text}
+
+    7. RISK MANAGEMENT FRAMEWORK
+       - Base stop-loss on actual support levels
+       - Base take-profit on actual resistance levels
+
+    8. CONCLUSION AND KEY TAKEAWAYS
+       - Summarize using actual data only
+
+    9. ACTIONABLE INSIGHTS CHECKLIST
+       - Use actual price levels only
+
+    Ensure all numerical references in your analysis match the ACTUAL DATA provided above.
     """
     
     try:
@@ -782,18 +760,17 @@ Please provide a detailed technical analysis covering these specific sections:
             "Content-Type": "application/json"
         }
         
-        # Use updated model names
         data = {
-            "model": ai_provider if 'ai_provider' in locals() else "llama-3.1-8b-instant",
+            "model": ai_provider,
             "messages": [
-                {"role": "system", "content": "You are a professional technical analyst at an investment bank. Provide precise, data-driven analysis with actionable insights."},
+                {"role": "system", "content": "You are a professional technical analyst. Use ONLY the actual data provided. Do not make up numbers. Current price is in the provided data."},
                 {"role": "user", "content": analysis_prompt}
             ],
-            "temperature": ai_temperature if 'ai_temperature' in locals() else 0.7,
+            "temperature": ai_temperature,
             "max_tokens": 1500
         }
         
-        with st.spinner("🤖 AI is analyzing the data.."):
+        with st.spinner("🤖 AI is analyzing the data..."):
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=headers,
@@ -810,13 +787,10 @@ Please provide a detailed technical analysis covering these specific sections:
             elif response.status_code == 429:
                 return "⚠️ Rate limit exceeded. Free tier allows 30 requests/minute. Please wait a moment."
             else:
-                # Try to parse error message
                 try:
                     error_data = response.json()
                     if 'error' in error_data:
                         error_msg = error_data['error'].get('message', 'Unknown error')
-                        if 'decommissioned' in error_msg:
-                            return f"❌ Model error: {error_msg}\n\nPlease select a different model from the sidebar."
                         return f"❌ API Error: {error_msg}"
                 except:
                     pass
@@ -826,116 +800,6 @@ Please provide a detailed technical analysis covering these specific sections:
         return "⏰ Request timed out. Please try again."
     except Exception as e:
         return f"⚠️ Error: {str(e)}"
-
-# ----------------------------------------------------
-# ROC ANALYSIS FUNCTIONS
-# ----------------------------------------------------
-def get_roc_summary_stats(roc_results):
-    """Get summary statistics from ROC results"""
-    if roc_results is None or roc_results.empty:
-        return {
-            'current_trend': 'No Data',
-            'current_roc': 0,
-            'current_signal': 'NEUTRAL',
-            'uptrend_count': 0,
-            'downtrend_count': 0,
-            'avg_roc_uptrend': 0,
-            'avg_roc_downtrend': 0
-        }
-    
-    current_trend = roc_results['Trend'].iloc[-1] if not roc_results['Trend'].iloc[-1] == '-' else 'No Trend'
-    current_roc = roc_results['ROC'].iloc[-1] * 100 if not pd.isna(roc_results['ROC'].iloc[-1]) else 0
-    
-    if current_trend == 'Uptrend':
-        current_signal = 'BUY'
-    elif current_trend == 'Downtrend':
-        current_signal = 'SELL'
-    else:
-        current_signal = 'NEUTRAL'
-    
-    uptrend_count = (roc_results['Trend'] == 'Uptrend').sum()
-    downtrend_count = (roc_results['Trend'] == 'Downtrend').sum()
-    
-    avg_roc_uptrend = roc_results.loc[roc_results['Trend'] == 'Uptrend', 'ROC'].mean() * 100 if uptrend_count > 0 else 0
-    avg_roc_downtrend = roc_results.loc[roc_results['Trend'] == 'Downtrend', 'ROC'].mean() * 100 if downtrend_count > 0 else 0
-    
-    return {
-        'current_trend': current_trend,
-        'current_roc': current_roc,
-        'current_signal': current_signal,
-        'uptrend_count': uptrend_count,
-        'downtrend_count': downtrend_count,
-        'avg_roc_uptrend': avg_roc_uptrend,
-        'avg_roc_downtrend': avg_roc_downtrend
-    }
-
-def display_roc_analysis(df, roc_window, roc_threshold, roc_consecutive):
-    """Display ROC Trend Detection analysis"""
-    if not ROC_AVAILABLE:
-        return None
-    
-    try:
-        roc_results = roc_trend_detector(
-            series=df['Close'],
-            window=roc_window,
-            threshold=roc_threshold,
-            consecutive=roc_consecutive
-        )
-        
-        summary = get_roc_summary_stats(roc_results)
-        
-        # Display metrics
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            trend_class = "trend-up" if summary['current_trend'] == 'Uptrend' else "trend-down" if summary['current_trend'] == 'Downtrend' else "trend-neutral"
-            st.markdown(f"""
-            <div class='metric-card'>
-                <h3>Current Trend</h3>
-                <p class='{trend_class}' style='font-size: 24px;'>{summary['current_trend']}</p>
-                <p>ROC: {summary['current_roc']:.2f}%</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            signal_color = "trend-up" if summary['current_signal'] == 'BUY' else "trend-down" if summary['current_signal'] == 'SELL' else "trend-neutral"
-            st.markdown(f"""
-            <div class='metric-card'>
-                <h3>Current Signal</h3>
-                <p class='{signal_color}' style='font-size: 24px;'>{summary['current_signal']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown(f"""
-            <div class='metric-card'>
-                <h3>Uptrend Periods</h3>
-                <p style='font-size: 24px; color: #10B981;'>{summary['uptrend_count']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col4:
-            st.markdown(f"""
-            <div class='metric-card'>
-                <h3>Downtrend Periods</h3>
-                <p style='font-size: 24px; color: #EF4444;'>{summary['downtrend_count']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Plot ROC chart
-        st.subheader("ROC Analysis Chart")
-        roc_fig = plot_roc_trends(roc_results, threshold=roc_threshold)
-        st.pyplot(roc_fig)
-        
-        return roc_results
-        
-    except Exception as e:
-        st.error(f"Error in ROC analysis: {str(e)}")
-        return None
-
-# ----------------------------------------------------
-# FALLBACK ANALYSIS (if API fails)
-# ----------------------------------------------------
 def generate_fallback_analysis(summary, support_levels, resistance_levels):
     """Generate basic analysis if API fails"""
     
