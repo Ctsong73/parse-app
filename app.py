@@ -667,59 +667,59 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
 
 STRUCTURE YOUR 1000-WORD REPORT AS FOLLOWS:
 
-1. EXECUTIVE SUMMARY (Approximately 100 words)
+1. EXECUTIVE SUMMARY
    - Brief overview of key findings
    - Primary trading bias (bullish/bearish/neutral)
    - Key price levels to watch
 
-2. MARKET CONTEXT AND ENVIRONMENT (Approximately 150 words)
+2. MARKET CONTEXT AND ENVIRONMENT
    - Current market conditions and sentiment
    - Volatility assessment (high/low/medium)
    - Volume analysis and liquidity considerations
    - Overall market structure
 
-3. DETAILED PRICE ACTION ANALYSIS (Approximately 200 words)
+3. DETAILED PRICE ACTION ANALYSIS
    - Current price position relative to historical ranges
    - Recent price momentum and acceleration
    - Candlestick patterns and formations
    - Breakout/breakdown analysis
    - Multiple timeframe alignment (if data permits)
 
-4. COMPREHENSIVE TREND ANALYSIS (Approximately 150 words)
+4. COMPREHENSIVE TREND ANALYSIS
    - Primary trend direction and strength
    - Secondary and tertiary trends
    - Trend duration and maturity assessment
    - Trend confirmation signals
    - Potential trend reversal indicators
 
-5. TECHNICAL INDICATOR DEEP DIVE (Approximately 200 words)
+5. TECHNICAL INDICATOR DEEP DIVE
    - RSI analysis with multiple timeframe perspectives
    - MACD histogram analysis and signal line crossovers
    - Moving Average analysis (golden cross/death cross)
    - Bollinger Band positioning and squeeze analysis
    - Additional oscillator insights
 
-6. SUPPORT AND RESISTANCE ZONE ANALYSIS (Approximately 100 words)
+6. SUPPORT AND RESISTANCE ZONE ANALYSIS
    - Major support levels with confidence ratings
    - Major resistance levels with confidence ratings
    - Supply and demand zone identification
    - Psychological price levels
    - Historical significance of key levels
 
-7. TRADING STRATEGIES AND SCENARIOS (Approximately 50 words)
+7. TRADING STRATEGIES AND SCENARIOS
    - Bullish scenario with entry/exit/stop-loss
    - Bearish scenario with entry/exit/stop-loss
    - Neutral/range-bound scenario strategy
    - Position sizing recommendations
    - Timeframe-specific approaches
 
-8. RISK MANAGEMENT FRAMEWORK (Approximately 25 words)
+8. RISK MANAGEMENT FRAMEWORK
    - Stop-loss placement strategies
    - Take-profit targets
    - Risk-reward ratio assessment
    - Portfolio allocation suggestions
 
-9. CONCLUSION AND KEY TAKEAWAYS (Approximately 25 words)
+9. CONCLUSION AND KEY TAKEAWAYS
    - Summary of most important findings
    - Final trading recommendation
    - Next key levels to monitor
@@ -759,7 +759,7 @@ Please provide a detailed technical analysis covering these specific sections:
             "max_tokens": 1500
         }
         
-        with st.spinner("🤖 AI is analyzing the data..."):
+        with st.spinner("🤖 AI is analyzing the data.."):
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=headers,
@@ -958,7 +958,7 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
-    with st.spinner("📊 Loading and analyzing data..."):
+    with st.spinner("📊 Loading and analyzing data.."):
         df = load_data_from_upload(uploaded_file)
         
         if df is not None:
