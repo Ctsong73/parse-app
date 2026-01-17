@@ -308,7 +308,7 @@ with st.sidebar:
         ai_provider = st.selectbox("AI Model", [
             "llama-3.1-8b-instant",      # Fast & efficient
             "llama-3.3-70b-versatile",   # More powerful
-            "gemma2-9b-it",              # Good alternative
+            "gemma-7b-it",              # Good alternative
         ])
         ai_temperature = st.slider("AI Creativity", 0.0, 1.0, 0.7, 
                                    help="Higher values = more creative, Lower values = more focused")
