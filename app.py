@@ -663,32 +663,76 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
     latest_data = df.iloc[-1] if len(df) > 0 else {}
     
     analysis_prompt = f"""
-    Generate a comprehensive 1000-word detailed technical analysis report:
-    
-    SECURITY ANALYSIS REPORT
-    ========================
-    
-    DATA SUMMARY:
-    - Data Frequency: {data_frequency}
-    - Total Data Points: {len(df)}
-    - Time Period: {df.index[0].strftime('%Y-%m-%d') if len(df) > 0 else 'N/A'} to {df.index[-1].strftime('%Y-%m-%d') if len(df) > 0 else 'N/A'}
-    
-    CURRENT MARKET CONDITIONS:
-    - Current Price: ${summary.get('current_price', 0):.2f}
-    - Price Change: {summary.get('price_change', 0):+.2f}%
-    - Market Trend: {summary.get('trend', 'Unknown')}
-    - RSI Level: {summary.get('rsi', 0):.2f} ({'Overbought' if summary.get('rsi', 0) > 70 else 'Oversold' if summary.get('rsi', 0) < 30 else 'Neutral'})
-    
-    TECHNICAL INDICATORS:
-    - Moving Averages: {', '.join([f'MA {period}' for period in selected_ma_periods])}
-    - MACD: {latest_data.get('MACD', 0):.4f}
-    - MACD Signal: {latest_data.get('MACD_Signal', 0):.4f}
-    
-    KEY LEVELS:
-    - Support: {', '.join([f'${level:.2f}' for level in support_levels[:3]]) if support_levels else 'None'}
-    - Resistance: {', '.join([f'${level:.2f}' for level in resistance_levels[:3]]) if resistance_levels else 'None'}
-    
-    Please provide a detailed technical analysis covering:
+    Generate a comprehensive technical analysis report that is approximately 1000 words in length. The report must be thorough and detailed, covering all aspects comprehensively.
+
+STRUCTURE YOUR 1000-WORD REPORT AS FOLLOWS:
+
+1. EXECUTIVE SUMMARY (Approximately 100 words)
+   - Brief overview of key findings
+   - Primary trading bias (bullish/bearish/neutral)
+   - Key price levels to watch
+
+2. MARKET CONTEXT AND ENVIRONMENT (Approximately 150 words)
+   - Current market conditions and sentiment
+   - Volatility assessment (high/low/medium)
+   - Volume analysis and liquidity considerations
+   - Overall market structure
+
+3. DETAILED PRICE ACTION ANALYSIS (Approximately 200 words)
+   - Current price position relative to historical ranges
+   - Recent price momentum and acceleration
+   - Candlestick patterns and formations
+   - Breakout/breakdown analysis
+   - Multiple timeframe alignment (if data permits)
+
+4. COMPREHENSIVE TREND ANALYSIS (Approximately 150 words)
+   - Primary trend direction and strength
+   - Secondary and tertiary trends
+   - Trend duration and maturity assessment
+   - Trend confirmation signals
+   - Potential trend reversal indicators
+
+5. TECHNICAL INDICATOR DEEP DIVE (Approximately 200 words)
+   - RSI analysis with multiple timeframe perspectives
+   - MACD histogram analysis and signal line crossovers
+   - Moving Average analysis (golden cross/death cross)
+   - Bollinger Band positioning and squeeze analysis
+   - Additional oscillator insights
+
+6. SUPPORT AND RESISTANCE ZONE ANALYSIS (Approximately 100 words)
+   - Major support levels with confidence ratings
+   - Major resistance levels with confidence ratings
+   - Supply and demand zone identification
+   - Psychological price levels
+   - Historical significance of key levels
+
+7. TRADING STRATEGIES AND SCENARIOS (Approximately 50 words)
+   - Bullish scenario with entry/exit/stop-loss
+   - Bearish scenario with entry/exit/stop-loss
+   - Neutral/range-bound scenario strategy
+   - Position sizing recommendations
+   - Timeframe-specific approaches
+
+8. RISK MANAGEMENT FRAMEWORK (Approximately 25 words)
+   - Stop-loss placement strategies
+   - Take-profit targets
+   - Risk-reward ratio assessment
+   - Portfolio allocation suggestions
+
+9. CONCLUSION AND KEY TAKEAWAYS (Approximately 25 words)
+   - Summary of most important findings
+   - Final trading recommendation
+   - Next key levels to monitor
+
+10. ACTIONABLE INSIGHTS CHECKLIST (Bullet points)
+    - Specific entry triggers
+    - Exit criteria
+    - Risk management rules
+    - Position management guidelines
+
+Ensure the total word count is approximately 1000 words by expanding on each section with detailed analysis, specific price references, and practical trading insights. Use precise numerical data from the provided analysis when available.
+
+Please provide a detailed technical analysis covering these specific sections:
     1. Trend analysis and momentum
     2. Key support/resistance levels
     3. Technical indicator signals
