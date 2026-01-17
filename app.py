@@ -839,13 +839,66 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
        - Use actual trend: {summary.get('trend', 'Unknown')}
        - Reference actual moving averages
 
-    5. TECHNICAL INDICATOR DEEP DIVE
-       - Use actual RSI: {summary.get('rsi', 0):.2f}
-       - Use actual MACD values provided above
-       - Use actual Bollinger Band values provided above
-       - Use actual Moving Average values provided above
+    5. TECHNICAL INDICATOR DEEP DIVE - COMPREHENSIVE ANALYSIS
 
-    6. SUPPORT AND RESISTANCE ZONE ANALYSIS
+   MOVING AVERAGES (MA) - DETAILED MULTI-TIMEFRAME ANALYSIS:
+   - Current MA values and alignment: Provide exact values for MA_10, MA_20, MA_50, MA_100, MA_200
+   - MA crossover analysis: Identify any recent golden crosses (bullish) or death crosses (bearish)
+   - MA slope analysis: Assess the slope/angle of each moving average (steep, moderate, flat)
+   - MA confluence zones: Identify price levels where multiple MAs converge (strong support/resistance)
+   - MA distance metrics: Calculate percentage distance of price from each MA (overextension analysis)
+   - MA ribbon analysis: Visual assessment of MA alignment and spacing
+   - Historical MA performance: Compare current MA setup to historical patterns
+   - MA-based trend strength: Use MA slopes and alignment to quantify trend strength
+
+   RSI (RELATIVE STRENGTH INDEX) - ADVANCED MOMENTUM ANALYSIS:
+   - Current RSI reading and interpretation: Exact value and significance level
+   - RSI trend analysis: Direction, slope, and momentum of RSI line
+   - RSI divergence detection: Regular and hidden bullish/bearish divergences
+   - RSI failure swing analysis: Overbought/oversold failure swings
+   - RSI centerline dynamics: Analysis of 50-level crossovers
+   - RSI multi-timeframe consistency: Compare RSI across different time horizons
+   - RSI pattern recognition: Chart patterns within RSI itself
+   - RSI extreme readings: Historical context for current RSI levels
+   - RSI-based reversal probabilities: Statistical likelihood of reversals
+   - RSI momentum divergence: When RSI momentum differs from price momentum
+
+   MACD (MOVING AVERAGE CONVERGENCE DIVERGENCE) - COMPREHENSIVE SIGNAL ANALYSIS:
+   - MACD line analysis: Current value, direction, and acceleration
+   - Signal line dynamics: Relationship to MACD line (above/below, converging/diverging)
+   - MACD histogram analysis: Bar-by-bar momentum assessment
+   - Zero-line significance: Position relative to zero line (bullish/bearish territory)
+   - Recent crossover events: Date, price, and significance of recent crosses
+   - MACD divergence patterns: Regular and hidden divergences with price
+   - Histogram pattern analysis: Increasing/decreasing momentum patterns
+   - MACD trend strength quantification: Using histogram amplitude
+   - Multi-timeframe MACD alignment: Consistency across timeframes
+   - MACD signal reliability: Historical accuracy assessment
+
+   BOLLINGER BANDS - ADVANCED VOLATILITY AND PRICE ANALYSIS:
+   - Current band positions: Exact values for upper, middle, and lower bands
+   - Band width analysis: Volatility assessment (expansion/contraction cycles)
+   - Bollinger Band squeeze identification: Low volatility periods preceding breakouts
+   - Price position analysis: Relative position within bands (overbought/oversold)
+   - %B indicator analysis: Quantitative position within bands
+   - Band breakout analysis: Recent breakouts with volume confirmation
+   - Band walking patterns: Price movement along upper/lower bands
+   - Dynamic support/resistance: How bands act as S/R levels
+   - Volatility-based risk assessment: Using band width for position sizing
+   - Historical band analysis: Compare current setup to past volatility regimes
+
+   INDICATOR CONFLUENCE AND SYNTHESIS:
+   - Multi-indicator alignment: Degree of agreement between all indicators
+   - Signal strength assessment: Weighted consensus from combined indicators
+   - Conflicting signal analysis: Resolving contradictory indicator readings
+   - Timeframe synchronization: Consistency across analyzed timeframe
+   - Historical pattern matching: Similar historical setups and outcomes
+   - Risk-adjusted signals: Combining indicators with volatility measures
+   - Leading vs lagging confirmation: How predictive/confirmatory indicators align
+   - Indicator-based probability assessment: Statistical likelihood of outcomes
+   - Custom indicator synthesis: Creating composite signals from multiple indicators
+
+6. SUPPORT AND RESISTANCE ZONE ANALYSIS
        - Use ONLY the actual support levels: {support_text}
        - Use ONLY the actual resistance levels: {resistance_text}
 
