@@ -692,28 +692,53 @@ STRUCTURE YOUR 1000-WORD REPORT AS FOLLOWS:
    - Trend confirmation signals
    - Potential trend reversal indicators
 
-5. TECHNICAL INDICATOR DEEP DIVE - COMPREHENSIVE ANALYSIS
-   - RSI MULTI-TIMEFRAME PERSPECTIVES: Daily, weekly, and intraday RSI analysis with divergence patterns
-   - MACD COMPLETE ANALYSIS: Histogram momentum, signal line dynamics, zero-line crossovers, and divergence signals
-   - MOVING AVERAGE INTEGRATED REVIEW: Multiple period MAs (10, 20, 50, 100, 200), crossovers, and slope analysis
-   - BOLLINGER BAND ADVANCED INTERPRETATION: Band width, %B indicator, squeeze detection, and volatility assessment
-   - STOCHASTIC OSCILLATOR DETAILS: Fast vs slow stochastic, overbought/oversold levels, and divergence analysis
-   - WILLIAMS %R AND MOMENTUM: Extreme readings, centerline crossovers, and trend confirmation
-   - COMMODITY CHANNEL INDEX (CCI): Trend strength measurement and cyclical patterns
-   - AVERAGE TRUE RANGE (ATR): Volatility assessment and position sizing implications
-   - ON-BALANCE VOLUME (OBV): Volume trend confirmation and divergence from price
-   - ACCUMULATION/DISTRIBUTION LINE: Money flow analysis and institutional activity
-   - RELATIVE STRENGTH COMPARISON: Performance vs benchmark indices or sector peers
-   - ICHIMOKU CLOUD ANALYSIS: If applicable, Tenkan-sen, Kijun-sen, and cloud dynamics
-   - PARABOLIC SAR: Trend following and stop-loss placement guidance
-   - ADX AND TREND STRENGTH: Directional Movement Index for trend quantification
-   - FIBONACCI RETRACEMENTS: Key Fibonacci levels and confluence with other indicators
-   - PIVOT POINTS ANALYSIS: Daily, weekly, and monthly pivot levels for support/resistance
-   - VOLUME PROFILE ANALYSIS: Value areas, point of control, and volume-by-price
-   - MARKET PROFILE THEORY: If applicable, time-based auction market analysis
-   - CUSTOM INDICATOR INTEGRATION: Any specialized indicators relevant to the analysis
-   - INDICATOR CONFLUENCE ZONES: Areas where multiple indicators provide aligned signals
-   - LEADING VS LAGGING INDICATOR SYNCHRONIZATION: Predictive vs confirmatory signal alignment
+5. TECHNICAL INDICATOR DEEP DIVE - FOCUSED EXPANDED ANALYSIS
+   MOVING AVERAGES (MA) DETAILED ANALYSIS:
+   - Current MA configuration: Exact values for MA_10, MA_20, MA_50, MA_100, MA_200 periods
+   - MA alignment and order: Bullish (shorter > longer) or Bearish (shorter < longer) alignment
+   - MA crossovers: Recent golden crosses (bullish) or death crosses (bearish) with dates and prices
+   - MA slopes: Upward, downward, or flat slopes indicating trend strength and direction
+   - MA as dynamic support/resistance: How price interacts with each moving average level
+   - MA confluence zones: Where multiple MAs cluster indicating strong support/resistance
+   - MA distance analysis: Percentage distance of price from each moving average
+   
+   RSI (RELATIVE STRENGTH INDEX) COMPREHENSIVE REVIEW:
+   - Current RSI value: Exact reading and its significance (oversold <30, neutral 30-70, overbought >70)
+   - RSI trend: Direction of RSI movement (rising, falling, flat) and momentum
+   - RSI divergence analysis: Regular and hidden divergences with price action
+   - RSI failure swings: Overbought/oversold failure swings indicating potential reversals
+   - RSI centerline crossovers: Bullish (crossing above 50) or bearish (crossing below 50)
+   - RSI range analysis: Current position within historical RSI ranges for this security
+   - RSI multi-timeframe consistency: How RSI readings align across different time horizons
+   - RSI pattern recognition: Formation of chart patterns within RSI itself
+   
+   MACD (MOVING AVERAGE CONVERGENCE DIVERGENCE) IN-DEPTH ANALYSIS:
+   - Current MACD line value: Exact reading and trend direction
+   - MACD signal line: Current value and relationship to MACD line (above/below)
+   - MACD histogram: Current histogram value, color (green/red), and momentum direction
+   - MACD zero line position: Above (bullish) or below (bearish) the zero line
+   - Recent MACD crossovers: Dates and significance of signal line crosses
+   - MACD divergence analysis: Bullish and bearish divergences with price confirmation
+   - MACD histogram patterns: Increasing/decreasing histogram bars indicating momentum shifts
+   - MACD trend strength: Steepness of MACD line indicating acceleration/deceleration
+   
+   BOLLINGER BANDS ADVANCED INTERPRETATION:
+   - Current band positions: Exact values for upper, middle (20MA), and lower bands
+   - Band width analysis: Narrow (low volatility, potential breakout) or wide (high volatility)
+   - Bollinger Band squeeze: Identification and significance of squeeze conditions
+   - Price position relative to bands: Upper band (overbought), middle (neutral), lower (oversold)
+   - %B indicator: Current %B value (0-100%) indicating position within bands
+   - Band breakout analysis: Recent breakouts above upper or below lower bands with volume
+   - Band walking: Price moving along upper/lower bands indicating strong trend
+   - Band support/resistance: How bands act as dynamic support and resistance levels
+   - Volatility assessment: Based on band expansion/contraction cycles
+   
+   INDICATOR CONFLUENCE AND SYNTHESIS:
+   - Agreement/disagreement: How all four indicators align or conflict in signals
+   - Signal strength assessment: Weight of evidence from combined indicator readings
+   - Timeframe alignment: Consistency of signals across the analyzed timeframe
+   - Historical context: How current indicator setup compares to past significant market events
+   - Risk assessment: What indicators suggest about current market risk environment
 
 6. SUPPORT AND RESISTANCE ZONE ANALYSIS
    - Major support levels with confidence ratings
