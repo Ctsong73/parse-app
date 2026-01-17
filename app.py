@@ -644,7 +644,7 @@ def create_macd_chart(df):
 # ----------------------------------------------------
 # GROQ AI ANALYSIS FUNCTION (UPDATED MODELS)
 # ----------------------------------------------------
-def generate_groq_analysis(summary, df, support_levels, resistance_levels, selected_ma_periods, data_frequency):
+def generate_groq_analysis(summary, df, support_levels, resistance_levels, selected_ma_periods, data_frequency, ai_provider, ai_temperature):
     """Generate AI analysis using Groq API (FREE)"""
     
     # Get API key
@@ -1090,9 +1090,10 @@ if uploaded_file is not None:
                     if st.button("Generate AI Analysis", type="primary"):
                         # Try Groq API first
                         analysis = generate_groq_analysis(
-                            summary, df, support_levels, resistance_levels, 
-                            selected_ma_periods, data_frequency
-                        )
+                        summary, df, support_levels, resistance_levels, 
+                        selected_ma_periods, data_frequency,
+                        ai_provider, ai_temperature
+                    )
                         
                         # Check if API failed
                         if analysis.startswith("❌") or analysis.startswith("⚠️"):
