@@ -446,8 +446,10 @@ with st.sidebar:
     
     if enable_ai_analysis and GROQ_CONFIGURED:
         ai_provider = st.selectbox("AI Model", [
-            "llama-3.1-8b-instant",      # Fast & efficient
-            "llama-3.3-70b-versatile",   # More powerful
+            "qwen/qwen3.8-27b",          # Fast, reliable, no reasoning overhead
+            "openai/gpt-oss-120b",       # More powerful
+            "openai/gpt-oss-20b",        # Fast & efficient
+            "allam-2-7b",                # Lightweight alternative
         ])
         ai_temperature = st.slider("AI Creativity", 0.0, 1.0, 0.7, 
                                    help="Higher values = more creative, Lower values = more focused")
@@ -1067,9 +1069,14 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
                 {"role": "user", "content": analysis_prompt}
             ],
             "temperature": ai_temperature,
-            "max_tokens": 1500
+            "max_completion_tokens": 3000
         }
-        
+
+        # gpt-oss models spend part of the token budget on internal reasoning.
+        # Keep that overhead low so the actual report is not truncated.
+        if ai_provider.startswith("openai/gpt-oss"):
+            data["reasoning_effort"] = "low"
+
         with st.spinner("AI is analyzing the data..."):
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
@@ -1080,10 +1087,15 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
             
             if response.status_code == 200:
                 result = response.json()
-                analysis = result['choices'][0]['message']['content']
+                message = result['choices'][0]['message']
+                analysis = (message.get('content') or '').strip()
+                if not analysis:
+                    return "Model error: the AI returned an empty response. Please try again or choose a different model."
                 return analysis
             elif response.status_code == 401:
                 return "Invalid API key. Please check your Groq API key at console.groq.com"
+            elif response.status_code == 404:
+                return "Model error: the selected model is no longer available on Groq. Please choose a different model from the sidebar."
             elif response.status_code == 429:
                 return "Rate limit exceeded. Free tier allows 30 requests/minute. Please wait a moment."
             else:
@@ -1091,6 +1103,8 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
                     error_data = response.json()
                     if 'error' in error_data:
                         error_msg = error_data['error'].get('message', 'Unknown error')
+                        if 'model_not_found' in str(error_data) or 'does not exist' in error_msg:
+                            return f"Model error: {error_msg}"
                         return f"API Error: {error_msg}"
                 except:
                     pass
@@ -1260,7 +1274,7 @@ if uploaded_file is not None:
                     )
                         
                         # Check if API failed
-                        if analysis.startswith(("Invalid API key", "Rate limit exceeded", "API Error", "Request timed out", "Error:")):
+                        if analysis.startswith(("Invalid API key", "Rate limit exceeded", "Model error", "API Error", "Request timed out", "Error:")):
                             st.warning("Using fallback analysis. Check API configuration for full AI features.")
                             analysis = generate_fallback_analysis(summary, support_levels, resistance_levels)
                         
