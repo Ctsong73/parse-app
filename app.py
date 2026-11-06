@@ -391,6 +391,59 @@ def setup_groq():
     
     return st.session_state.get('groq_api_key')
 
+# Fallback list used if Groq's live model list cannot be fetched
+FALLBACK_GROQ_MODELS = [
+    "qwen/qwen3.8-27b",
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "allam-2-7b",
+]
+PREFERRED_GROQ_MODEL = "qwen/qwen3.8-27b"
+
+
+def _is_chat_model(model):
+    """Return True only for text-in/text-out chat models."""
+    model_id = model.get("id", "")
+    if not model_id or model.get("active") is False:
+        return False
+    excluded = ("whisper", "orpheus", "prompt-guard", "safeguard", "embed", "tts")
+    if any(part in model_id.lower() for part in excluded):
+        return False
+    inputs = model.get("input_modalities")
+    outputs = model.get("output_modalities")
+    if inputs is not None and "text" not in inputs:
+        return False
+    if outputs is not None and "text" not in outputs:
+        return False
+    return True
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_groq_chat_models(api_key):
+    """Ask Groq which chat models are live right now (cached for 1 hour)."""
+    response = requests.get(
+        "https://api.groq.com/openai/v1/models",
+        headers={"Authorization": f"Bearer {api_key}"},
+        timeout=10,
+    )
+    response.raise_for_status()
+    models = response.json().get("data", [])
+    return sorted(m["id"] for m in models if _is_chat_model(m))
+
+
+def get_groq_model_options(api_key):
+    """Return (models, is_live). Falls back to a built-in list on failure."""
+    try:
+        models = list(fetch_groq_chat_models(api_key))
+    except Exception:
+        models = []
+    if not models:
+        return FALLBACK_GROQ_MODELS, False
+    if PREFERRED_GROQ_MODEL in models:
+        models.remove(PREFERRED_GROQ_MODEL)
+        models.insert(0, PREFERRED_GROQ_MODEL)
+    return models, True
+
 # Check if Groq is configured
 GROQ_CONFIGURED = setup_groq() is not None
 
@@ -445,12 +498,17 @@ with st.sidebar:
                                          help="Generate detailed analysis using AI (FREE with Groq)")
     
     if enable_ai_analysis and GROQ_CONFIGURED:
-        ai_provider = st.selectbox("AI Model", [
-            "qwen/qwen3.8-27b",          # Fast, reliable, no reasoning overhead
-            "openai/gpt-oss-120b",       # More powerful
-            "openai/gpt-oss-20b",        # Fast & efficient
-            "allam-2-7b",                # Lightweight alternative
-        ])
+        model_options, models_are_live = get_groq_model_options(
+            st.session_state.get('groq_api_key')
+        )
+        ai_provider = st.selectbox("AI Model", model_options)
+        if models_are_live:
+            st.caption("Model list loaded live from Groq.")
+        else:
+            st.caption("Could not load Groq's live model list; using built-in models.")
+        if st.button("Refresh model list", help="Re-check which models Groq currently offers"):
+            fetch_groq_chat_models.clear()
+            st.rerun()
         ai_temperature = st.slider("AI Creativity", 0.0, 1.0, 0.7, 
                                    help="Higher values = more creative, Lower values = more focused")
     
