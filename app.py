@@ -39,10 +39,17 @@ st.markdown("""
         background: #F5F6F8;
         border-right: 1px solid #D9DEE5;
     }
-    .main .block-container,
-    [data-testid="stMainBlockContainer"] {
+    section[data-testid="stSidebar"] {
+        min-width: 300px;
+    }
+    .main .block-container {
         max-width: 1320px;
         padding: 2.5rem 2rem 3rem;
+    }
+    [data-testid="stMainBlockContainer"] {
+        max-width: 1320px;
+        padding-top: 2.5rem;
+        padding-bottom: 3rem;
     }
     h1, h2, h3, h4 {
         color: #243247;
@@ -55,21 +62,42 @@ st.markdown("""
         font-weight: 700 !important;
         line-height: 1.15 !important;
         margin: 0 0 0.25rem !important;
-        letter-spacing: -0.045em;
+        padding: 0 !important;
+        letter-spacing: -0.02em !important;
+    }
+    .main-header {
+        font-size: 2.8rem;
+        color: #1E334C;
+        text-align: left;
+        margin: 0 0 0.25rem;
+        padding: 0;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .sub-header {
+        font-size: 1.05rem;
+        color: #5A6879;
+        text-align: left;
+        margin: 0 0 0.6rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1.4;
     }
     h2.sub-header {
-        color: #66758A !important;
         font-size: 1.05rem !important;
+        color: #5A6879 !important;
         font-weight: 500 !important;
         line-height: 1.4 !important;
         margin: 0 0 0.6rem !important;
-        letter-spacing: 0;
     }
     .app-description {
         color: #5D6A79;
         font-size: 0.98rem;
         line-height: 1.6;
         margin: 0 0 2rem;
+    }
+    [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"] {
+        color: #29394B;
     }
     div[data-testid="stFileUploader"],
     div[data-testid="stDataFrame"] {
@@ -98,14 +126,14 @@ st.markdown("""
         border: 1px dashed #AEB9C7;
         border-radius: 12px;
     }
-    [data-testid="stFileUploaderDropzone"]:hover {
-        border-color: #315D8A;
-        background-color: #F8FAFC;
-    }
     [data-testid="stFileUploaderDropzone"] svg,
     [data-testid="stAlert"] svg,
     [data-testid="stFileUploader"] [data-testid="stTooltipIcon"] {
         display: none;
+    }
+    [data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #315D8A;
+        background-color: #F8FAFC;
     }
     [data-testid="stMetric"] {
         background-color: #FFFFFF;
@@ -113,9 +141,11 @@ st.markdown("""
         border-radius: 10px;
         padding: 1rem 1.1rem;
         box-shadow: 0 2px 8px rgba(31, 53, 83, 0.04);
+        min-height: 132px;
     }
     .metric-card {
         height: 100%;
+        min-height: 132px;
         background-color: #FFFFFF;
         border: 1px solid #E1E6EC;
         border-left: 4px solid #315D8A;
@@ -124,14 +154,14 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(31, 53, 83, 0.04);
     }
     .metric-card h3 {
-        color: #66758A;
+        color: #5A6879;
         font-size: 0.9rem;
         font-weight: 600;
         margin: 0 0 0.65rem;
     }
-    .trend-up { color: #10B981; font-weight: bold; }
-    .trend-down { color: #EF4444; font-weight: bold; }
-    .trend-neutral { color: #6B7280; font-weight: bold; }
+    .trend-up { color: #047857; font-weight: bold; }
+    .trend-down { color: #B91C1C; font-weight: bold; }
+    .trend-neutral { color: #5A6879; font-weight: bold; }
     .ai-analysis {
         background-color: #FFFFFF;
         border: 1px solid #E1E6EC;
@@ -154,17 +184,27 @@ st.markdown("""
         color: #34445A;
         line-height: 1.7;
     }
-    [data-testid="stTabs"] button {
-        color: #66758A;
-        font-weight: 600;
-        padding: 0.75rem 0.25rem;
-    }
-    [data-testid="stTabs"] button[aria-selected="true"] {
-        color: #315D8A;
+    [data-testid="stTabs"] {
+        border: 0;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
     }
     [data-testid="stTabs"] [role="tablist"] {
         border-bottom: 1px solid #D7DEE6;
         gap: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+    [data-testid="stTabs"] button {
+        color: #5A6879;
+        font-weight: 600;
+        padding: 0.75rem 0.25rem;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+    }
+    [data-testid="stTabs"] button[aria-selected="true"] {
+        color: #315D8A;
+        border-bottom: 2px solid #315D8A;
     }
     [data-testid="stDataFrame"] {
         overflow: hidden;
@@ -176,12 +216,11 @@ st.markdown("""
         border-radius: 10px;
     }
     @media (max-width: 768px) {
-        .main .block-container,
         [data-testid="stMainBlockContainer"] {
             padding: 1.5rem 1rem 2rem;
         }
-        h1.main-header {
-            font-size: 2.25rem !important;
+        .main-header {
+            font-size: 2.25rem;
         }
     }
 </style>
@@ -215,23 +254,27 @@ def roc_trend_detector(series, window=3, threshold=0.02, consecutive=3):
 def plot_roc_trends(df, threshold=0.01):
     """Plots ROC values with trend coloring"""
     roc_clean = df['ROC'].dropna()
-    colors = df['Trend'].map({'Uptrend': 'green', 'Downtrend': 'red'}).fillna('Steelblue')
+    colors = df['Trend'].map({'Uptrend': '#047857', 'Downtrend': '#B91C1C'}).fillna('#94A3B8')
     colors = colors.loc[roc_clean.index]
 
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.bar(roc_clean.index, roc_clean * 100, color=colors)
+    fig, ax = plt.subplots(figsize=(12, 4.8), facecolor='white')
+    ax.set_facecolor('white')
+    ax.bar(roc_clean.index, roc_clean * 100, color=colors, width=0.9)
     
     # Add both threshold lines
-    ax.axhline(y=threshold * 100, color='green', linestyle='--', linewidth=1.5, alpha=0.7, label='Uptrend Threshold')
-    ax.axhline(y=-threshold * 100, color='red', linestyle='--', linewidth=1.5, alpha=0.7, label='Downtrend Threshold')
-    ax.axhline(y=0, color='gray', linestyle='-', linewidth=0.5, alpha=0.5)
+    ax.axhline(y=threshold * 100, color='#047857', linestyle='--', linewidth=1.2, alpha=0.8, label='Uptrend Threshold')
+    ax.axhline(y=-threshold * 100, color='#B91C1C', linestyle='--', linewidth=1.2, alpha=0.8, label='Downtrend Threshold')
+    ax.axhline(y=0, color='#94A3B8', linestyle='-', linewidth=0.8, alpha=0.7)
     
     # Add labels and legend
-    ax.set_xlabel('Date')
-    ax.set_ylabel('ROC (%)')
-    ax.set_title('Rate of Change (ROC) Trend Analysis')
-    ax.legend()
-    ax.grid(True, alpha=0.3)
+    ax.set_xlabel('Date', color='#243247')
+    ax.set_ylabel('ROC (%)', color='#243247')
+    ax.set_title('Rate of Change (ROC) Trend Analysis', color='#243247', fontsize=12, fontweight='600', loc='left', pad=10)
+    ax.tick_params(colors='#5A6879')
+    for spine in ax.spines.values():
+        spine.set_color('#E5EAF0')
+    ax.legend(loc='upper left', frameon=False)
+    ax.grid(axis='y', color='#E5EAF0', alpha=0.9)
     
     plt.tight_layout()
     return fig
@@ -678,6 +721,34 @@ def generate_summary(df, support_levels, resistance_levels):
 # ----------------------------------------------------
 # CHART FUNCTIONS
 # ----------------------------------------------------
+CHART_COLORS = {
+    "price": "#315D8A",
+    "up": "#047857",
+    "down": "#B91C1C",
+    "neutral": "#5A6879",
+    "grid": "#E5EAF0",
+    "ma": ["#315D8A", "#D97706", "#7C3AED", "#0891B2", "#DC2626", "#059669"],
+}
+
+
+def apply_chart_style(fig, height=400):
+    """Apply a consistent, professional Plotly style."""
+    fig.update_layout(
+        height=height,
+        hovermode="x unified",
+        template="plotly_white",
+        font=dict(family='Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif', color="#243247", size=12),
+        title=None,
+        margin=dict(l=12, r=12, t=16, b=12),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0, bgcolor="rgba(0,0,0,0)"),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+    )
+    fig.update_xaxes(showgrid=True, gridcolor=CHART_COLORS["grid"], zeroline=False, title_text="Date")
+    fig.update_yaxes(showgrid=True, gridcolor=CHART_COLORS["grid"], zeroline=False, selector=dict(anchor="x"))
+    return fig
+
+
 def create_main_chart(df, support_levels, resistance_levels):
     """Create main price chart"""
     fig = go.Figure()
@@ -687,7 +758,7 @@ def create_main_chart(df, support_levels, resistance_levels):
             x=df.index,
             y=df['Close'],
             name='Price',
-            line=dict(color='#1E3A8A', width=2),
+            line=dict(color=CHART_COLORS["price"], width=2),
             mode='lines'
         )
     )
@@ -696,18 +767,20 @@ def create_main_chart(df, support_levels, resistance_levels):
         fig.add_hline(
             y=level,
             line_dash="dot",
-            line_color="green",
+            line_color=CHART_COLORS["up"],
             opacity=0.5,
-            annotation_text=f"S: {level:.2f}"
+            annotation_text=f"S: {level:.2f}",
+            annotation_font_color=CHART_COLORS["up"],
         )
     
     for level in resistance_levels:
         fig.add_hline(
             y=level,
             line_dash="dot",
-            line_color="red",
+            line_color=CHART_COLORS["down"],
             opacity=0.5,
-            annotation_text=f"R: {level:.2f}"
+            annotation_text=f"R: {level:.2f}",
+            annotation_font_color=CHART_COLORS["down"],
         )
     
     # Calculate 10% padding for y-axis
@@ -716,15 +789,9 @@ def create_main_chart(df, support_levels, resistance_levels):
     y_range = y_max - y_min
     padding = y_range * 0.1
     
-    fig.update_layout(
-        title=f'Price Chart ({data_frequency})',
-        height=400,
-        showlegend=True,
-        xaxis_title="Date",
-        yaxis_title="Price",
-        yaxis_range=[y_min - padding, y_max + padding],  # 10% padding
-        template='plotly_white'
-    )
+    fig.update_layout(yaxis_range=[y_min - padding, y_max + padding])
+    apply_chart_style(fig, height=420)
+    fig.update_yaxes(title_text="Price")
     
     return fig
 
@@ -737,13 +804,12 @@ def create_ma_chart(df, selected_ma_periods):
             x=df.index,
             y=df['Close'],
             name='Price',
-            line=dict(color='#1E3A8A', width=1.5),
+            line=dict(color=CHART_COLORS["neutral"], width=1.5),
             mode='lines',
-            opacity=0.7
+            opacity=0.65
         )
     )
     
-    colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
     for i, period in enumerate(selected_ma_periods):
         ma_col = f'MA_{period}'
         if ma_col in df.columns:
@@ -752,7 +818,7 @@ def create_ma_chart(df, selected_ma_periods):
                     x=df.index,
                     y=df[ma_col],
                     name=f'MA {period}',
-                    line=dict(color=colors[i % len(colors)], width=2)
+                    line=dict(color=CHART_COLORS["ma"][i % len(CHART_COLORS["ma"])], width=2)
                 )
             )
     
@@ -762,15 +828,9 @@ def create_ma_chart(df, selected_ma_periods):
     y_range = y_max - y_min
     padding = y_range * 0.1
     
-    fig.update_layout(
-        title='Moving Averages',
-        height=400,
-        showlegend=True,
-        xaxis_title="Date",
-        yaxis_title="Price",
-        yaxis_range=[y_min - padding, y_max + padding],  # 10% padding
-        template='plotly_white'
-    )
+    fig.update_layout(yaxis_range=[y_min - padding, y_max + padding])
+    apply_chart_style(fig, height=400)
+    fig.update_yaxes(title_text="Price")
     
     return fig
 
@@ -781,52 +841,51 @@ def create_bollinger_chart(df):
     
     fig = go.Figure()
     
-    # Price line - make it prominent
-    fig.add_trace(
-        go.Scatter(
-            x=df.index,
-            y=df['Close'],
-            name='Price',
-            line=dict(color='#1E3A8A', width=3),
-            mode='lines'
-        )
-    )
-    
-    # Bollinger Bands - make them more visible
-    # Upper band - thicker, dashed, different color
+    # Upper band (draw first so fill layers correctly with middle/lower)
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['BB_Upper'],
             name='BB Upper',
-            line=dict(color='#DC2626', width=2, dash='dash'),  # Red, dashed
-            opacity=0.8,
-            fillcolor='rgba(220, 38, 38, 0.1)',
-            fill='tonexty'
+            line=dict(color=CHART_COLORS["down"], width=1.5, dash='dash'),
+            opacity=0.85,
         )
     )
     
-    # Middle band - keep subtle
+    # Middle band
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['BB_Middle'],
             name='BB Middle (SMA 20)',
-            line=dict(color='#6B7280', width=1.5),  # Gray
-            opacity=0.6
+            line=dict(color=CHART_COLORS["neutral"], width=1.5),
+            opacity=0.7,
+            fill='tonexty',
+            fillcolor='rgba(185, 28, 28, 0.04)',
         )
     )
     
-    # Lower band - thicker, dashed, different color
+    # Lower band
     fig.add_trace(
         go.Scatter(
             x=df.index,
             y=df['BB_Lower'],
             name='BB Lower',
-            line=dict(color='#059669', width=2, dash='dash'),  # Green, dashed
-            opacity=0.8,
+            line=dict(color=CHART_COLORS["up"], width=1.5, dash='dash'),
+            opacity=0.85,
             fill='tonexty',
-            fillcolor='rgba(5, 150, 105, 0.1)'
+            fillcolor='rgba(4, 120, 87, 0.04)',
+        )
+    )
+    
+    # Price line
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=df['Close'],
+            name='Price',
+            line=dict(color=CHART_COLORS["price"], width=2.5),
+            mode='lines',
         )
     )
     
@@ -836,22 +895,9 @@ def create_bollinger_chart(df):
     y_range = y_max - y_min
     padding = y_range * 0.1
     
-    fig.update_layout(
-        title='Bollinger Bands',
-        height=400,
-        showlegend=True,
-        xaxis_title="Date",
-        yaxis_title="Price",
-        yaxis_range=[y_min - padding, y_max + padding],  # 10% padding
-        template='plotly_white',
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        )
-    )
+    fig.update_layout(yaxis_range=[y_min - padding, y_max + padding])
+    apply_chart_style(fig, height=400)
+    fig.update_yaxes(title_text="Price")
     
     return fig
 
@@ -867,26 +913,19 @@ def create_rsi_chart(df):
             x=df.index,
             y=df['RSI'],
             name='RSI',
-            line=dict(color='#8E44AD', width=2)
+            line=dict(color="#7C3AED", width=2)
         )
     )
     
     # Add RSI reference lines
-    fig.add_hline(y=70, line_dash="dash", line_color="red", opacity=0.5, annotation_text="Overbought (70)")
-    fig.add_hline(y=30, line_dash="dash", line_color="green", opacity=0.5, annotation_text="Oversold (30)")
-    fig.add_hline(y=50, line_dash="dot", line_color="gray", opacity=0.3)
-    fig.add_hline(y=100, line_dash="dot", line_color="gray", opacity=0.3)  # Added 100 line
-    fig.add_hline(y=0, line_dash="dot", line_color="gray", opacity=0.3)    # Added 0 line
+    fig.add_hline(y=70, line_dash="dash", line_color=CHART_COLORS["down"], opacity=0.6, annotation_text="Overbought (70)", annotation_font_color=CHART_COLORS["down"])
+    fig.add_hline(y=30, line_dash="dash", line_color=CHART_COLORS["up"], opacity=0.6, annotation_text="Oversold (30)", annotation_font_color=CHART_COLORS["up"])
+    fig.add_hline(y=50, line_dash="dot", line_color=CHART_COLORS["neutral"], opacity=0.35)
+    fig.add_hrect(y0=30, y1=70, fillcolor="rgba(90, 104, 121, 0.04)", line_width=0)
     
-    fig.update_layout(
-        title='Relative Strength Index (RSI)',
-        height=300,
-        showlegend=True,
-        xaxis_title="Date",
-        yaxis_title="RSI",
-        yaxis_range=[-5, 105],  # Add padding for RSI (0-100 range)
-        template='plotly_white'
-    )
+    fig.update_layout(yaxis_range=[0, 100])
+    apply_chart_style(fig, height=300)
+    fig.update_yaxes(title_text="RSI")
     
     return fig
 
@@ -902,7 +941,7 @@ def create_macd_chart(df):
             x=df.index,
             y=df['MACD'],
             name='MACD Line',
-            line=dict(color='#3498DB', width=2),
+            line=dict(color="#315D8A", width=2),
             mode='lines'
         )
     )
@@ -912,39 +951,37 @@ def create_macd_chart(df):
             x=df.index,
             y=df['MACD_Signal'],
             name='Signal Line',
-            line=dict(color='#E74C3C', width=2),
+            line=dict(color="#D97706", width=2),
             mode='lines'
         )
     )
     
-    colors = ['#2ECC71' if x > 0 else '#E74C3C' for x in df['MACD_Hist']]
+    colors = [CHART_COLORS["up"] if x > 0 else CHART_COLORS["down"] for x in df['MACD_Hist']]
     fig.add_trace(
         go.Bar(
             x=df.index,
             y=df['MACD_Hist'],
             name='MACD Histogram',
             marker_color=colors,
-            opacity=0.6,
+            opacity=0.45,
             yaxis='y2'
         )
     )
     
-    fig.add_hline(y=0, line_dash="dash", line_color="gray", opacity=0.5)
+    fig.add_hline(y=0, line_dash="dash", line_color=CHART_COLORS["neutral"], opacity=0.5)
     
     fig.update_layout(
-        title='Moving Average Convergence Divergence (MACD)',
-        height=400,
-        showlegend=True,
-        xaxis_title="Date",
-        yaxis_title="MACD & Signal Line",
         yaxis2=dict(
             title="Histogram",
             overlaying='y',
             side='right',
-            showgrid=False
+            showgrid=False,
+            zeroline=False,
+            color=CHART_COLORS["neutral"],
         ),
-        template='plotly_white'
     )
+    apply_chart_style(fig, height=400)
+    fig.update_yaxes(title_text="MACD / Signal")
     
     return fig
 
@@ -1248,7 +1285,7 @@ if uploaded_file is not None:
             with tabs[0]:
                 st.subheader("Price Chart")
                 main_fig = create_main_chart(df, support_levels, resistance_levels)
-                st.plotly_chart(main_fig, use_container_width=True)
+                st.plotly_chart(main_fig, width="stretch")
                 
                 # Metrics
                 col1, col2, col3 = st.columns(3)
@@ -1257,7 +1294,7 @@ if uploaded_file is not None:
                 with col2:
                     if summary['rsi']:
                         rsi_status = "Overbought" if summary['rsi'] > 70 else "Oversold" if summary['rsi'] < 30 else "Neutral"
-                        st.metric("RSI", f"{summary['rsi']:.2f}", rsi_status)
+                        st.metric("RSI", f"{summary['rsi']:.2f}", rsi_status, delta_color="off")
                 with col3:
                     st.metric("Trend", summary['trend'])
                 
@@ -1283,29 +1320,29 @@ if uploaded_file is not None:
                 if show_ma_chart:
                     st.subheader("Moving Averages")
                     ma_fig = create_ma_chart(df, selected_ma_periods)
-                    st.plotly_chart(ma_fig, use_container_width=True)
+                    st.plotly_chart(ma_fig, width="stretch")
                 
                 if show_bollinger:
                     st.subheader("Bollinger Bands")
                     bb_fig = create_bollinger_chart(df)
                     if bb_fig:
-                        st.plotly_chart(bb_fig, use_container_width=True)
+                        st.plotly_chart(bb_fig, width="stretch")
                 
                 if show_rsi:
                     st.subheader("RSI")
                     rsi_fig = create_rsi_chart(df)
                     if rsi_fig:
-                        st.plotly_chart(rsi_fig, use_container_width=True)
+                        st.plotly_chart(rsi_fig, width="stretch")
                 
                 if show_macd:
                     st.subheader("MACD")
                     macd_fig = create_macd_chart(df)
                     if macd_fig:
-                        st.plotly_chart(macd_fig, use_container_width=True)
+                        st.plotly_chart(macd_fig, width="stretch")
             
             with tabs[1]:
                 st.subheader("Data Preview")
-                st.dataframe(df.tail(50), use_container_width=True)
+                st.dataframe(df.tail(50), width="stretch")
                 
                 csv = df.to_csv()
                 st.download_button(
@@ -1332,15 +1369,12 @@ if uploaded_file is not None:
                     )
                         
                         # Check if API failed
-                        if analysis.startswith(("Invalid API key", "Rate limit exceeded", "Model error", "API Error", "Request timed out", "Error:")):
+                        if analysis.startswith(("Invalid API key", "Rate limit exceeded", "Model error", "API Error", "Request timed out", "Error:", "Warning:")):
                             st.warning("Using fallback analysis. Check API configuration for full AI features.")
                             analysis = generate_fallback_analysis(summary, support_levels, resistance_levels)
                         
-                        st.markdown(f"""
-                        <div class='ai-analysis'>
-                            {analysis}
-                        </div>
-                        """, unsafe_allow_html=True)
+                        with st.container(border=True):
+                            st.markdown(analysis)
                         
                         # Download option
                         st.download_button(
@@ -1404,9 +1438,9 @@ else:
 st.divider()
 st.markdown(
     """
-    <div style='text-align: center; color: gray;'>
-    <p style='font-size: 16px; font-weight: bold;'>Parse: Technical Analysis AI Assistant</p>
-    <p style='font-size: 12px;'>Powered by Groq AI • Rate of Change (ROC) Trend Detection</p>
+    <div style='text-align: center; color: #5A6879;'>
+    <p style='font-size: 15px; font-weight: 600; color: #243247; margin-bottom: 0.2rem;'>Parse: Technical Analysis AI Assistant</p>
+    <p style='font-size: 12px; margin: 0;'>Powered by Groq AI • Rate of Change (ROC) Trend Detection</p>
     </div>
     """,
     unsafe_allow_html=True
