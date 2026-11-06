@@ -13,7 +13,6 @@ from datetime import datetime
 # Set page config FIRST (must be first Streamlit command)
 st.set_page_config(
     page_title="Parse: Technical Analysis AI Assistant",
-    page_icon="📈",
     layout="wide"
 )
 
@@ -23,34 +22,175 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Import ROC Detector functions (inlined)
 ROC_AVAILABLE = True
 
-# Custom CSS for better styling
+# Custom CSS for a polished, consistent interface
 st.markdown("""
 <style>
-.main-header {
-    font-size: 3.5rem;
-    color: #1E3A8A;
-    text-align: center;
-    margin-bottom: 0.2rem;
-    margin-top: 0.5rem;
-    padding-top: 1rem;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-}
-.sub-header {
-    font-size: 1.3rem;
-    color: #4B5563;
-    text-align: center;
-    margin-bottom: 2.5rem;
-    font-weight: 400;
-    font-style: italic;
-}
+    .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"] {
+        background: #E9EDF1 !important;
+        color: #243247 !important;
+        font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    [data-testid="stHeader"] {
+        background-color: transparent;
+    }
+    section[data-testid="stSidebar"] > div {
+        background: #F5F6F8;
+        border-right: 1px solid #D9DEE5;
+    }
+    .main .block-container,
+    [data-testid="stMainBlockContainer"] {
+        max-width: 1320px;
+        padding: 2.5rem 2rem 3rem;
+    }
+    h1, h2, h3, h4 {
+        color: #243247;
+        font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        letter-spacing: -0.02em;
+    }
+    h1.main-header {
+        color: #1E334C !important;
+        font-size: 2.8rem !important;
+        font-weight: 700 !important;
+        line-height: 1.15 !important;
+        margin: 0 0 0.25rem !important;
+        letter-spacing: -0.045em;
+    }
+    h2.sub-header {
+        color: #66758A !important;
+        font-size: 1.05rem !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        margin: 0 0 0.6rem !important;
+        letter-spacing: 0;
+    }
+    .app-description {
+        color: #5D6A79;
+        font-size: 0.98rem;
+        line-height: 1.6;
+        margin: 0 0 2rem;
+    }
+    div[data-testid="stFileUploader"],
+    div[data-testid="stDataFrame"] {
+        background-color: #FFFFFF;
+        border: 1px solid #DCE2E8;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 4px 14px rgba(37, 51, 67, 0.045);
+    }
+    div.stButton > button,
+    div.stDownloadButton > button {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background-color 120ms ease, border-color 120ms ease;
+    }
+    div.stButton > button[kind="primary"] {
+        background-color: #315D8A;
+        border-color: #315D8A;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background-color: #264B73;
+        border-color: #264B73;
+    }
+    [data-testid="stFileUploaderDropzone"] {
+        background-color: #FFFFFF;
+        border: 1px dashed #AEB9C7;
+        border-radius: 12px;
+    }
+    [data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #315D8A;
+        background-color: #F8FAFC;
+    }
+    [data-testid="stFileUploaderDropzone"] svg,
+    [data-testid="stAlert"] svg,
+    [data-testid="stFileUploader"] [data-testid="stTooltipIcon"] {
+        display: none;
+    }
+    [data-testid="stMetric"] {
+        background-color: #FFFFFF;
+        border: 1px solid #E1E6EC;
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 2px 8px rgba(31, 53, 83, 0.04);
+    }
+    .metric-card {
+        height: 100%;
+        background-color: #FFFFFF;
+        border: 1px solid #E1E6EC;
+        border-left: 4px solid #315D8A;
+        padding: 1rem 1.15rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(31, 53, 83, 0.04);
+    }
+    .metric-card h3 {
+        color: #66758A;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0 0 0.65rem;
+    }
+    .trend-up { color: #10B981; font-weight: bold; }
+    .trend-down { color: #EF4444; font-weight: bold; }
+    .trend-neutral { color: #6B7280; font-weight: bold; }
+    .ai-analysis {
+        background-color: #FFFFFF;
+        border: 1px solid #E1E6EC;
+        border-left: 4px solid #315D8A;
+        padding: 1.25rem 1.5rem;
+        border-radius: 10px;
+        margin: 1.25rem 0;
+        color: #34445A;
+        font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.7;
+        white-space: pre-wrap;
+    }
+    .instructions-box {
+        background-color: #FFFFFF;
+        border: 1px solid #E1E6EC;
+        border-left: 4px solid #71869E;
+        padding: 1.25rem 1.5rem;
+        border-radius: 10px;
+        margin: 1.25rem 0;
+        color: #34445A;
+        line-height: 1.7;
+    }
+    [data-testid="stTabs"] button {
+        color: #66758A;
+        font-weight: 600;
+        padding: 0.75rem 0.25rem;
+    }
+    [data-testid="stTabs"] button[aria-selected="true"] {
+        color: #315D8A;
+    }
+    [data-testid="stTabs"] [role="tablist"] {
+        border-bottom: 1px solid #D7DEE6;
+        gap: 1.25rem;
+    }
+    [data-testid="stDataFrame"] {
+        overflow: hidden;
+        padding: 0;
+    }
+    [data-testid="stExpander"] {
+        background: #FFFFFF;
+        border: 1px solid #DCE2E8;
+        border-radius: 10px;
+    }
+    @media (max-width: 768px) {
+        .main .block-container,
+        [data-testid="stMainBlockContainer"] {
+            padding: 1.5rem 1rem 2rem;
+        }
+        h1.main-header {
+            font-size: 2.25rem !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Title with different font sizes
+# App title
 st.markdown("<h1 class='main-header'>Parse</h1>", unsafe_allow_html=True)
-st.markdown("<h3 class='sub-header'>Technical Analysis AI Assistant</h3>", unsafe_allow_html=True)
-st.markdown("Upload your price data for comprehensive technical analysis with AI insights.")
+st.markdown("<h2 class='sub-header'>Technical Analysis AI Assistant</h2>", unsafe_allow_html=True)
+st.markdown("<p class='app-description'>Upload your price data for comprehensive technical analysis with AI insights.</p>", unsafe_allow_html=True)
 
 def roc_trend_detector(series, window=3, threshold=0.02, consecutive=3):
     """Detects trends based on Rate of Change (ROC)"""
@@ -220,7 +360,7 @@ def setup_groq():
             return groq_key
         else:
             # Show setup instructions in sidebar
-            with st.sidebar.expander("🔑 AI API Setup", expanded=True):
+            with st.sidebar.expander("AI API Setup", expanded=True):
                 st.markdown("""
                 ### Configure AI Analysis:
                 
@@ -243,7 +383,7 @@ def setup_groq():
                 if test_key:
                     st.session_state.groq_api_key = test_key
                     st.session_state.groq_configured = True
-                    st.success("✅ Using session key")
+                    st.success("Using session key")
                     return test_key
             
             st.session_state.groq_configured = False
@@ -256,10 +396,10 @@ GROQ_CONFIGURED = setup_groq() is not None
 
 # Sidebar for settings
 with st.sidebar:
-    st.header("⚙️ Analysis Settings")
+    st.header("Analysis Settings")
     
     # Data frequency selection
-    st.subheader("📅 Data Frequency")
+    st.subheader("Data Frequency")
     data_frequency = st.selectbox(
         "Select data frequency",
         ["Daily", "Weekly"],
@@ -274,30 +414,30 @@ with st.sidebar:
         ma_periods = [10, 20]
         ma_default = [10, 20]
     
-    st.subheader("📊 Moving Average Periods")
+    st.subheader("Moving Average Periods")
     selected_ma_periods = st.multiselect(
         "Select MA periods to display",
         ma_periods,
         default=ma_default
     )
     
-    st.subheader("📈 Chart Options")
+    st.subheader("Chart Options")
     show_rsi = st.checkbox("Show RSI", value=True)
     show_macd = st.checkbox("Show MACD", value=True)
     show_bollinger = st.checkbox("Show Bollinger Bands", value=True)
     show_ma_chart = st.checkbox("Show Moving Averages Chart", value=True)
     
     if ROC_AVAILABLE:
-        st.subheader("🎯 ROC Trend Detection")
+        st.subheader("ROC Trend Detection")
         show_roc = st.checkbox("Show ROC Analysis", value=True)
         roc_window = st.slider("ROC Window", 3, 21, 7, help="Lookback period for ROC calculation")
         roc_threshold = st.slider("ROC Threshold (%)", 0.1, 5.0, 2.0, step=0.1) / 100  # Default 2%
         roc_consecutive = st.slider("Consecutive Periods", 1, 7, 3, help="Number of consecutive periods to confirm trend")
     
-    st.subheader("🤖 AI Analysis Settings")
+    st.subheader("AI Analysis Settings")
     
     if not GROQ_CONFIGURED:
-        st.error("❌ Groq API key not configured")
+        st.error("Groq API key not configured")
         st.info("Configure AI key in the expander above")
         enable_ai_analysis = False
     else:
@@ -313,7 +453,7 @@ with st.sidebar:
                                    help="Higher values = more creative, Lower values = more focused")
     
     st.divider()
-    st.info("📋 Required columns: Date, Price (or Close)")
+    st.info("Required columns: Date, Price (or Close)")
 
 # ----------------------------------------------------
 # DATA PROCESSING FUNCTIONS
@@ -380,11 +520,11 @@ def load_data_from_upload(uploaded_file):
         
         # Check data sufficiency
         if data_frequency == "Daily" and len(df) < 250:
-            st.warning(f"⚠️ For daily data, 1 year (250+ trading days) is recommended for accurate analysis. You have {len(df)} days.")
+            st.warning(f"For daily data, 1 year (250+ trading days) is recommended for accurate analysis. You have {len(df)} days.")
         elif data_frequency == "Weekly" and len(df) < 156:
-            st.warning(f"⚠️ For weekly data, 3 years (156+ weeks) is recommended for accurate analysis. You have {len(df)} weeks.")
+            st.warning(f"For weekly data, 3 years (156+ weeks) is recommended for accurate analysis. You have {len(df)} weeks.")
         
-        st.info(f"✅ Data loaded: {len(df)} {data_frequency.lower()} rows")
+        st.info(f"Data loaded: {len(df)} {data_frequency.lower()} rows")
         
         return df
         
@@ -930,7 +1070,7 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
             "max_tokens": 1500
         }
         
-        with st.spinner("🤖 AI is analyzing the data..."):
+        with st.spinner("AI is analyzing the data..."):
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=headers,
@@ -943,36 +1083,36 @@ def generate_groq_analysis(summary, df, support_levels, resistance_levels, selec
                 analysis = result['choices'][0]['message']['content']
                 return analysis
             elif response.status_code == 401:
-                return "❌ Invalid API key. Please check your Groq API key at console.groq.com"
+                return "Invalid API key. Please check your Groq API key at console.groq.com"
             elif response.status_code == 429:
-                return "⚠️ Rate limit exceeded. Free tier allows 30 requests/minute. Please wait a moment."
+                return "Rate limit exceeded. Free tier allows 30 requests/minute. Please wait a moment."
             else:
                 try:
                     error_data = response.json()
                     if 'error' in error_data:
                         error_msg = error_data['error'].get('message', 'Unknown error')
-                        return f"❌ API Error: {error_msg}"
+                        return f"API Error: {error_msg}"
                 except:
                     pass
-                return f"❌ API Error {response.status_code}. Please try again."
+                return f"API Error {response.status_code}. Please try again."
                 
     except requests.exceptions.Timeout:
-        return "⏰ Request timed out. Please try again."
+        return "Request timed out. Please try again."
     except Exception as e:
-        return f"⚠️ Error: {str(e)}"
+        return f"Error: {str(e)}"
 def generate_fallback_analysis(summary, support_levels, resistance_levels):
     """Generate basic analysis if API fails"""
     
     if summary['price_change'] > 2:
-        sentiment = "BULLISH 📈"
+        sentiment = "BULLISH"
         recommendation = "Consider buying on dips with stop-loss below nearest support."
         outlook = "Positive momentum suggests further upside potential."
     elif summary['price_change'] < -2:
-        sentiment = "BEARISH 📉"
+        sentiment = "BEARISH"
         recommendation = "Consider selling on rallies or wait for confirmation of support."
         outlook = "Downward pressure suggests caution is warranted."
     else:
-        sentiment = "NEUTRAL ↔️"
+        sentiment = "NEUTRAL"
         recommendation = "Range-bound trading likely. Buy near support, sell near resistance."
         outlook = "Consolidation phase; wait for breakout confirmation."
     
@@ -980,7 +1120,7 @@ def generate_fallback_analysis(summary, support_levels, resistance_levels):
     resistance_text = ', '.join([f'${level:.2f}' for level in resistance_levels[:3]]) if resistance_levels else 'None identified'
     
     return f"""
-    📊 TECHNICAL ANALYSIS REPORT
+    TECHNICAL ANALYSIS REPORT
     
     MARKET SENTIMENT: {sentiment}
     
@@ -1010,13 +1150,13 @@ def generate_fallback_analysis(summary, support_levels, resistance_levels):
 # MAIN APP
 # ----------------------------------------------------
 uploaded_file = st.file_uploader(
-    "📁 Upload your price data file",
+    "Upload your price data file",
     type=['csv', 'xlsx', 'xls'],
     help="File must contain Date and Price columns"
 )
 
 if uploaded_file is not None:
-    with st.spinner("📊 Loading and analyzing data.."):
+    with st.spinner("Loading and analyzing data.."):
         df = load_data_from_upload(uploaded_file)
         
         if df is not None:
@@ -1025,11 +1165,11 @@ if uploaded_file is not None:
             summary = generate_summary(df, support_levels, resistance_levels)
             
             # Create tabs
-            tab_names = ["📈 Main Analysis", "📊 Data Preview"]
+            tab_names = ["Main Analysis", "Data Preview"]
             if ROC_AVAILABLE and show_roc:
-                tab_names.append("🎯 ROC Analysis")
+                tab_names.append("ROC Analysis")
             if enable_ai_analysis:
-                tab_names.append("🤖 AI Analysis")
+                tab_names.append("AI Analysis")
             
             tabs = st.tabs(tab_names)
             
@@ -1052,7 +1192,7 @@ if uploaded_file is not None:
                 # Key Levels
                 col4, col5 = st.columns(2)
                 with col4:
-                    st.subheader("🛡️ Support Levels")
+                    st.subheader("Support Levels")
                     if support_levels:
                         for i, level in enumerate(support_levels[:3], 1):
                             st.write(f"**S{i}:** ${level:.2f}")
@@ -1060,7 +1200,7 @@ if uploaded_file is not None:
                         st.write("No support levels found")
                 
                 with col5:
-                    st.subheader("⛰️ Resistance Levels")
+                    st.subheader("Resistance Levels")
                     if resistance_levels:
                         for i, level in enumerate(resistance_levels[:3], 1):
                             st.write(f"**R{i}:** ${level:.2f}")
@@ -1097,19 +1237,19 @@ if uploaded_file is not None:
                 
                 csv = df.to_csv()
                 st.download_button(
-                    "📥 Download Data",
+                    "Download Data",
                     data=csv,
                     file_name="ta_data.csv",
                     mime="text/csv"
                 )
             
-            if ROC_AVAILABLE and show_roc and len(tabs) > 2 and "🎯 ROC Analysis" in tab_names:
-                with tabs[tab_names.index("🎯 ROC Analysis")]:
+            if ROC_AVAILABLE and show_roc and len(tabs) > 2 and "ROC Analysis" in tab_names:
+                with tabs[tab_names.index("ROC Analysis")]:
                     display_roc_analysis(df, roc_window, roc_threshold, roc_consecutive)
             
-            if enable_ai_analysis and "🤖 AI Analysis" in tab_names:
-                with tabs[tab_names.index("🤖 AI Analysis")]:
-                    st.header("🤖 AI-Powered Analysis")
+            if enable_ai_analysis and "AI Analysis" in tab_names:
+                with tabs[tab_names.index("AI Analysis")]:
+                    st.header("AI-Powered Analysis")
                     
                     if st.button("Generate AI Analysis", type="primary"):
                         # Try Groq API first
@@ -1120,7 +1260,7 @@ if uploaded_file is not None:
                     )
                         
                         # Check if API failed
-                        if analysis.startswith("❌") or analysis.startswith("⚠️"):
+                        if analysis.startswith(("Invalid API key", "Rate limit exceeded", "API Error", "Request timed out", "Error:")):
                             st.warning("Using fallback analysis. Check API configuration for full AI features.")
                             analysis = generate_fallback_analysis(summary, support_levels, resistance_levels)
                         
@@ -1132,22 +1272,22 @@ if uploaded_file is not None:
                         
                         # Download option
                         st.download_button(
-                            "📝 Download Analysis Report",
+                            "Download Analysis Report",
                             data=analysis,
                             file_name=f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
                             mime="text/plain"
                         )
             
-            st.success("✅ Analysis complete!")
+            st.success("Analysis complete!")
 
 else:
-    st.info("👆 Upload a file to begin")
+    st.info("Upload a file to begin")
     
     # OPERATING INSTRUCTIONS SECTION
-    with st.expander("📋 Operating Instructions", expanded=True):
+    with st.expander("Operating Instructions", expanded=True):
         st.markdown("""
         <div class='instructions-box'>
-        <h3>📊 Data Requirements for Accurate Analysis:</h3>
+        <h3>Data Requirements for Accurate Analysis:</h3>
         
         **For Daily Data:**
         • Upload **1 year or more** of daily price data (250+ trading days recommended)
@@ -1182,7 +1322,7 @@ else:
         st.dataframe(sample_data)
         
         st.download_button(
-            "📥 Download Sample Data",
+            "Download Sample Data",
             data=sample_data.to_csv(index=False),
             file_name="sample_price_data.csv",
             mime="text/csv"
