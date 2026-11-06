@@ -5,6 +5,7 @@ import numpy as np
 import tempfile
 import os
 import sys
+import io
 import matplotlib.pyplot as plt
 import requests
 import json
@@ -363,7 +364,7 @@ def display_roc_analysis(df, roc_window, roc_threshold, roc_consecutive):
             st.markdown(f"""
             <div class="metric-card">
                 <h3>Uptrend Periods</h3>
-                <p style="font-size: 24px; color: #10B981;">{summary["uptrend_count"]}</p>
+                <p style="font-size: 24px; color: #047857;">{summary["uptrend_count"]}</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -371,7 +372,7 @@ def display_roc_analysis(df, roc_window, roc_threshold, roc_consecutive):
             st.markdown(f"""
             <div class="metric-card">
                 <h3>Downtrend Periods</h3>
-                <p style="font-size: 24px; color: #EF4444;">{summary["downtrend_count"]}</p>
+                <p style="font-size: 24px; color: #B91C1C;">{summary["downtrend_count"]}</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -379,6 +380,17 @@ def display_roc_analysis(df, roc_window, roc_threshold, roc_consecutive):
         st.subheader("ROC Analysis Chart")
         roc_fig = plot_roc_trends(roc_results, threshold=roc_threshold)
         st.pyplot(roc_fig)
+        roc_buf = io.BytesIO()
+        roc_fig.savefig(roc_buf, format='png', dpi=160, bbox_inches='tight', facecolor='white')
+        roc_buf.seek(0)
+        st.download_button(
+            "Download PNG",
+            data=roc_buf.getvalue(),
+            file_name=f"roc_analysis_{datetime.now().strftime('%Y%m%d')}.png",
+            mime="image/png",
+            key=f"dl_roc_{roc_window}_{int(roc_threshold*10000)}_{roc_consecutive}",
+        )
+        plt.close(roc_fig)
         
         return roc_results
         
@@ -731,6 +743,13 @@ CHART_COLORS = {
 }
 
 
+PLOTLY_DOWNLOAD_CONFIG = {
+    "displaylogo": False,
+    "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+    "toImageButtonOptions": {"format": "png", "filename": "parse_chart", "scale": 2},
+}
+
+
 def apply_chart_style(fig, height=400):
     """Apply a consistent, professional Plotly style."""
     fig.update_layout(
@@ -747,6 +766,21 @@ def apply_chart_style(fig, height=400):
     fig.update_xaxes(showgrid=True, gridcolor=CHART_COLORS["grid"], zeroline=False, title_text="Date")
     fig.update_yaxes(showgrid=True, gridcolor=CHART_COLORS["grid"], zeroline=False, selector=dict(anchor="x"))
     return fig
+
+
+def plotly_download_button(fig, filename, key, height=400):
+    """Render a PNG download button for a Plotly figure when export is available."""
+    try:
+        img = fig.to_image(format="png", width=1200, height=max(360, int(height)), scale=2)
+    except Exception:
+        return
+    st.download_button(
+        "Download PNG",
+        data=img,
+        file_name=f"{filename}.png",
+        mime="image/png",
+        key=key,
+    )
 
 
 def create_main_chart(df, support_levels, resistance_levels):
@@ -1285,7 +1319,8 @@ if uploaded_file is not None:
             with tabs[0]:
                 st.subheader("Price Chart")
                 main_fig = create_main_chart(df, support_levels, resistance_levels)
-                st.plotly_chart(main_fig, width="stretch")
+                st.plotly_chart(main_fig, width="stretch", config=PLOTLY_DOWNLOAD_CONFIG)
+                plotly_download_button(main_fig, "price_chart", "dl_price", height=420)
                 
                 # Metrics
                 col1, col2, col3 = st.columns(3)
@@ -1320,25 +1355,29 @@ if uploaded_file is not None:
                 if show_ma_chart:
                     st.subheader("Moving Averages")
                     ma_fig = create_ma_chart(df, selected_ma_periods)
-                    st.plotly_chart(ma_fig, width="stretch")
+                    st.plotly_chart(ma_fig, width="stretch", config=PLOTLY_DOWNLOAD_CONFIG)
+                    plotly_download_button(ma_fig, "moving_averages", "dl_ma", height=400)
                 
                 if show_bollinger:
                     st.subheader("Bollinger Bands")
                     bb_fig = create_bollinger_chart(df)
                     if bb_fig:
-                        st.plotly_chart(bb_fig, width="stretch")
+                        st.plotly_chart(bb_fig, width="stretch", config=PLOTLY_DOWNLOAD_CONFIG)
+                        plotly_download_button(bb_fig, "bollinger_bands", "dl_bb", height=400)
                 
                 if show_rsi:
                     st.subheader("RSI")
                     rsi_fig = create_rsi_chart(df)
                     if rsi_fig:
-                        st.plotly_chart(rsi_fig, width="stretch")
+                        st.plotly_chart(rsi_fig, width="stretch", config=PLOTLY_DOWNLOAD_CONFIG)
+                        plotly_download_button(rsi_fig, "rsi", "dl_rsi", height=300)
                 
                 if show_macd:
                     st.subheader("MACD")
                     macd_fig = create_macd_chart(df)
                     if macd_fig:
-                        st.plotly_chart(macd_fig, width="stretch")
+                        st.plotly_chart(macd_fig, width="stretch", config=PLOTLY_DOWNLOAD_CONFIG)
+                        plotly_download_button(macd_fig, "macd", "dl_macd", height=400)
             
             with tabs[1]:
                 st.subheader("Data Preview")
