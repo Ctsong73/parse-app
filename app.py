@@ -771,7 +771,9 @@ def apply_chart_style(fig, height=400):
 def plotly_download_button(fig, filename, key, height=400):
     """Render a chart download button (PNG when available, HTML fallback)."""
     try:
-        img = fig.to_image(format="png", width=1200, height=max(360, int(height)), scale=2)
+        export_fig = go.Figure(fig)
+        export_fig.update_layout(paper_bgcolor="white", plot_bgcolor="white")
+        img = export_fig.to_image(format="png", width=1200, height=max(360, int(height)), scale=2)
         st.download_button(
             "Download PNG",
             data=img,
