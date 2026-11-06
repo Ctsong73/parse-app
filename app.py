@@ -769,18 +769,25 @@ def apply_chart_style(fig, height=400):
 
 
 def plotly_download_button(fig, filename, key, height=400):
-    """Render a PNG download button for a Plotly figure when export is available."""
+    """Render a chart download button (PNG when available, HTML fallback)."""
     try:
         img = fig.to_image(format="png", width=1200, height=max(360, int(height)), scale=2)
+        st.download_button(
+            "Download PNG",
+            data=img,
+            file_name=f"{filename}.png",
+            mime="image/png",
+            key=key,
+        )
     except Exception:
-        return
-    st.download_button(
-        "Download PNG",
-        data=img,
-        file_name=f"{filename}.png",
-        mime="image/png",
-        key=key,
-    )
+        html = fig.to_html(include_plotlyjs="cdn", full_html=True)
+        st.download_button(
+            "Download chart (HTML)",
+            data=html,
+            file_name=f"{filename}.html",
+            mime="text/html",
+            key=key,
+        )
 
 
 def create_main_chart(df, support_levels, resistance_levels):
